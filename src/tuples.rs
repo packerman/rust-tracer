@@ -1,15 +1,16 @@
 use approx::AbsDiffEq;
 use std::ops;
 
-#[derive(PartialEq, Debug)]
-struct Tuple {
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub struct Tuple {
     x: f32,
     y: f32,
     z: f32,
     w: f32,
 }
 
-type Point = Tuple;
+pub type Point = Tuple;
+pub type Vector = Tuple;
 
 impl Tuple {
 
@@ -17,6 +18,10 @@ impl Tuple {
         Tuple {
             x, y, z, w,
         }
+    }
+
+    pub fn y(&self) -> f32 {
+        self.y
     }
 
     fn is_point(&self) -> bool {
@@ -31,26 +36,45 @@ impl Tuple {
         (self.x*self.x + self.y*self.y + self.z*self.z + self.w*self.w).sqrt()
     }
 
-    fn normalize(&self) -> Tuple {
+    pub fn normalize(&self) -> Tuple {
         let m = self.magnitude();
         Tuple::new(self.x / m, self.y / m, self.z / m, self.w / m)
     }
+
+    fn dot(&self, other: &Tuple) -> f32 {
+        self.x*other.x + self.y*other.y + self.z*other.z + self.w*other.w
+    }
+
+    fn cross(&self, other: &Tuple) -> Vector {
+        vector(self.y*other.z - self.z*other.y,
+            self.z*other.x - self.x*other.z,
+            self.x*other.y - self.y*other.x)
+    }
 }
 
-fn point(x: f32, y: f32, z: f32) -> Point {
+pub fn point(x: f32, y: f32, z: f32) -> Point {
     Tuple::new(x, y, z, 1.0)
 }
 
-fn vector(x: f32, y: f32, z: f32) -> Point {
+pub fn vector(x: f32, y: f32, z: f32) -> Vector {
     Tuple::new(x, y, z, 0.0)
 }
 
-impl ops::Add for Tuple {
+impl ops::Add<Tuple> for Tuple {
 
     type Output = Self;
 
-    fn add(self, _rhs: Self) -> Self {
-        Tuple::new(self.x + _rhs.x, self.y + _rhs.y, self.z + _rhs.z, self.w + _rhs.w)
+    fn add(self, other: Self) -> Self {
+        Tuple::new(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
+     }
+}
+
+impl ops::Add<&Tuple> for Tuple {
+
+    type Output = Self;
+
+    fn add(self, other: &Self) -> Self {
+        Tuple::new(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
      }
 }
 
@@ -58,8 +82,8 @@ impl ops::Sub for Tuple {
 
     type Output = Self;
 
-    fn sub(self, _rhs: Self) -> Self {
-        Tuple::new(self.x - _rhs.x, self.y - _rhs.y, self.z - _rhs.z, self.w - _rhs.w)
+    fn sub(self, other: Self) -> Self {
+        Tuple::new(self.x - other.x, self.y - other.y, self.z - other.z, self.w - other.w)
      }
 }
 
@@ -260,5 +284,20 @@ mod tests {
         let v = vector(1.0, 2.0, 3.0);
         let norm = v.normalize();
         abs_diff_eq!(norm.magnitude(), 1.0);
+    }
+
+    #[test]
+    fn dot_product_of_two_tuples() {
+        let a = vector(1.0, 2.0, 3.0);
+        let b = vector(2.0, 3.0, 4.0);
+        assert_eq!(a.dot(&b), 20.0);
+    }
+
+    #[test]
+    fn cross_product_of_two_vectors() {
+        let a = vector(1.0, 2.0, 3.0);
+        let b = vector(2.0, 3.0, 4.0);
+        assert_eq!(a.cross(&b), vector(-1.0, 2.0, -1.0));
+        assert_eq!(b.cross(&a), vector(1.0, -2.0, 1.0));
     }
 }
