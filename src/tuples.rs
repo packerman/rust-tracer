@@ -130,49 +130,6 @@ impl AbsDiffEq for Tuple {
      }
 }
 
-impl ops::Neg for Tuple {
-
-    type Output = Self;
-
-    fn neg(self) -> Self {
-        Tuple::new(-self.x, -self.y, -self.z, -self.w)
-     }
-}
-
-impl ops::Mul<f32> for Tuple {
-
-    type Output = Self;
-
-    fn mul(self, factor: f32) -> Self {
-        Tuple::new(self.x * factor, self.y * factor, self.z * factor, self.w * factor)
-     }
-}
-
-impl ops::Div<f32> for Tuple {
-
-    type Output = Self;
-
-    fn div(self, factor: f32) -> Self {
-        Tuple::new(self.x / factor, self.y / factor, self.z / factor, self.w / factor)
-     }
-}
-
-impl AbsDiffEq for Tuple {
-
-    type Epsilon = f32;
-
-    fn default_epsilon() -> Self::Epsilon {
-        f32::default_epsilon()
-     }
-
-    fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
-        self.x.abs_diff_eq(&other.x, epsilon) &&
-        self.y.abs_diff_eq(&other.y, epsilon) &&
-        self.z.abs_diff_eq(&other.z, epsilon) &&
-        self.w.abs_diff_eq(&other.w, epsilon)
-     }
-}
-
 #[cfg(test)]
 mod tests {
 
