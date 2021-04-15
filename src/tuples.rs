@@ -52,15 +52,15 @@ impl Tuple {
             self.x*other.y - self.y*other.x)
     }
 
-    fn red(&self) -> f32 {
+    pub fn red(&self) -> f32 {
         self.x
     }
 
-    fn green(&self) -> f32 {
+    pub fn green(&self) -> f32 {
         self.y
     }
 
-    fn blue(&self) -> f32 {
+    pub fn blue(&self) -> f32 {
         self.z
     }
 }
