@@ -11,6 +11,7 @@ pub struct Tuple {
 
 pub type Point = Tuple;
 pub type Vector = Tuple;
+pub type Color = Tuple;
 
 impl Tuple {
 
@@ -18,6 +19,10 @@ impl Tuple {
         Tuple {
             x, y, z, w,
         }
+    }
+
+    pub fn x(&self) -> f32 {
+        self.x
     }
 
     pub fn y(&self) -> f32 {
@@ -50,6 +55,18 @@ impl Tuple {
             self.z*other.x - self.x*other.z,
             self.x*other.y - self.y*other.x)
     }
+
+    pub fn red(&self) -> f32 {
+        self.x
+    }
+
+    pub fn green(&self) -> f32 {
+        self.y
+    }
+
+    pub fn blue(&self) -> f32 {
+        self.z
+    }
 }
 
 pub fn point(x: f32, y: f32, z: f32) -> Point {
@@ -60,20 +77,15 @@ pub fn vector(x: f32, y: f32, z: f32) -> Vector {
     Tuple::new(x, y, z, 0.0)
 }
 
+pub fn color(x: f32, y: f32, z: f32) -> Color {
+    Tuple::new(x, y, z, 0.0)
+}
+
 impl ops::Add<Tuple> for Tuple {
 
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
-        Tuple::new(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
-     }
-}
-
-impl ops::Add<&Tuple> for Tuple {
-
-    type Output = Self;
-
-    fn add(self, other: &Self) -> Self {
         Tuple::new(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
      }
 }
@@ -102,6 +114,15 @@ impl ops::Mul<f32> for Tuple {
 
     fn mul(self, factor: f32) -> Self {
         Tuple::new(self.x * factor, self.y * factor, self.z * factor, self.w * factor)
+     }
+}
+
+impl ops::Mul<Tuple> for Tuple {
+
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self {
+        Tuple::new(self.x * other.x, self.y * other.y, self.z * other.z, self.w * other.w)
      }
 }
 
@@ -299,5 +320,40 @@ mod tests {
         let b = vector(2.0, 3.0, 4.0);
         assert_eq!(a.cross(&b), vector(-1.0, 2.0, -1.0));
         assert_eq!(b.cross(&a), vector(1.0, -2.0, 1.0));
+    }
+
+    #[test]
+    fn create_color() {
+        let c = color(-0.5, 0.4, 1.7);
+        assert_eq!(c.red(), -0.5);
+        assert_eq!(c.green(), 0.4);
+        assert_eq!(c.blue(), 1.7);
+    }
+
+    #[test]
+    fn adding_colors() {
+        let c1 = color(0.9, 0.6, 0.75);
+        let c2 = color(0.7, 0.1, 0.25);
+        abs_diff_eq!(c1 + c2, color(1.6, 0.7, 1.0));
+    }
+
+    #[test]
+    fn subtracting_colors() {
+        let c1 = color(0.9, 0.6, 0.75);
+        let c2 = color(0.7, 0.1, 0.25);
+        abs_diff_eq!(c1 - c2, color(0.2, 0.5, 0.5));
+    }
+
+    #[test]
+    fn multiplying_color_by_scalar() {
+        let c = color(0.2, 0.3, 0.4);
+        assert_eq!(c * 2.0, color(0.4, 0.6, 0.8));
+    }
+
+    #[test]
+    fn multiplying_colors() {
+        let c1 = color(1.0, 0.2, 0.4);
+        let c2 = color(0.9, 1.0, 0.1);
+        abs_diff_eq!(c1 * c2, color(0.9, 0.2, 0.04));
     }
 }

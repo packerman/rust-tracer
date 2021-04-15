@@ -1,4 +1,5 @@
 pub mod tuples;
+pub mod canvas;
 
 #[cfg(test)]
 mod tests {
