@@ -21,6 +21,10 @@ impl Tuple {
         }
     }
 
+    pub fn x(&self) -> f32 {
+        self.x
+    }
+
     pub fn y(&self) -> f32 {
         self.y
     }

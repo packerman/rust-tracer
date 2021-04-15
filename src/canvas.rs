@@ -51,7 +51,7 @@ impl PpmFormatter {
     }
 }
 
-struct Canvas {
+pub struct Canvas {
     width: usize,
     height: usize,
     pixels: Vec<Vec<Color>>,
@@ -59,7 +59,7 @@ struct Canvas {
 
 impl Canvas {
 
-    fn new(width: usize, height: usize) -> Canvas {
+    pub fn new(width: usize, height: usize) -> Canvas {
         let mut pixels = Vec::with_capacity(height);
         for _ in 0..height {
             let mut row = Vec::with_capacity(width);
@@ -75,7 +75,7 @@ impl Canvas {
         self.pixels[y][x]
     }
 
-    fn write_pixel(&mut self, x: usize, y: usize, c: Color) {
+    pub fn write_pixel(&mut self, x: usize, y: usize, c: Color) {
         self.pixels[y][x] = c;
     }
 
@@ -83,7 +83,7 @@ impl Canvas {
         (value * 255.0).round() as u8
     }
 
-    fn to_ppm(&self) -> Result<String, Error> {
+    pub fn to_ppm(&self) -> Result<String, Error> {
         let mut formatter = PpmFormatter::new(69, String::from(" "));
         formatter.write(String::from("P3"))?;
         formatter.new_line()?;
