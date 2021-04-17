@@ -21,6 +21,16 @@ impl Matrix4 {
                                             0.0, 1.0, 0.0, 0.0,
                                             0.0, 0.0, 1.0, 0.0,
                                             0.0, 0.0, 0.0, 1.0);
+
+    fn transpose(&self) -> Matrix4 {
+        let mut result = [[0.0; 4]; 4];
+        for i in 0..4 {
+            for j in 0..4 {
+                result[i][j] = self.0[j][i];
+            }
+        }
+        Matrix4 { 0 : result }
+    }
 }
 
 impl Index<(usize, usize)> for Matrix4 {
@@ -183,5 +193,26 @@ mod tests {
     fn multiplying_identity_matrix_by_tuple() {
         let a = Tuple::new(1.0, 2.0, 3.0, 4.0);
         assert_eq!(Matrix4::IDENTITY * a, a);
+    }
+
+    #[test]
+    fn transposing_matrix() {
+        let a = Matrix4::new(
+            0.0, 9.0, 3.0, 0.0,
+            9.0, 8.0, 0.0, 8.0,
+            1.0, 8.0, 5.0, 3.0,
+            0.0, 0.0, 5.0, 8.0
+        );
+        assert_eq!(a.transpose(), Matrix4::new(
+                                    0.0, 9.0, 1.0, 0.0,
+                                    9.0, 8.0, 8.0, 0.0,
+                                    3.0, 0.0, 5.0, 5.0,
+                                    0.0, 8.0, 3.0, 8.0));
+    }
+
+    #[test]
+    fn transposing_identity_matrix() {
+        let a = Matrix4::IDENTITY.transpose();
+        assert_eq!(a, Matrix4::IDENTITY);
     }
 }
