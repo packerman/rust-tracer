@@ -31,6 +31,16 @@ impl Matrix4 {
         }
         Matrix4 { 0 : result }
     }
+
+    fn sub_matrix(&self, l: usize, k: usize) -> Matrix3 {
+        let mut result = [[0.0; 3]; 3];
+        for i in 0..3 {
+            for j in 0..3 {
+                result[i][j] = self.0[if i < l { i } else { i + 1 }][if j < k { j } else { j + 1 }]
+            }
+        }
+        Matrix3 { 0 : result }
+    }
 }
 
 impl Index<(usize, usize)> for Matrix4 {
@@ -74,6 +84,7 @@ impl Mul<Tuple> for Matrix4 {
      }
 }
 
+#[derive(PartialEq, Debug)]
 struct Matrix2([[f32;2];2]);
 
 impl Matrix2 {
@@ -82,6 +93,10 @@ impl Matrix2 {
         Matrix2 {
             0: [[m00, m01], [m10, m11]],
         }
+    }
+
+    fn determinant(&self) -> f32 {
+        self.0[0][0] * self.0[1][1] - self.0[0][1] * self.0[1][0]
     }
 }
 
@@ -94,6 +109,7 @@ impl Index<(usize, usize)> for Matrix2 {
      }
 }
 
+#[derive(PartialEq, Debug)]
 struct Matrix3([[f32;3];3]);
 
 impl Matrix3 {
@@ -105,6 +121,16 @@ impl Matrix3 {
                 0: [[m00, m01, m02], [m10, m11, m12], [m20, m21, m22]],
             }
         }
+
+    fn sub_matrix(&self, l: usize, k: usize) -> Matrix2 {
+        let mut result = [[0.0; 2]; 2];
+        for i in 0..2 {
+            for j in 0..2 {
+                result[i][j] = self.0[if i < l { i } else { i + 1 }][if j < k { j } else { j + 1 }]
+            }
+        }
+        Matrix2 { 0 : result }
+    }
 }
 
 impl Index<(usize, usize)> for Matrix3 {
@@ -214,5 +240,38 @@ mod tests {
     fn transposing_identity_matrix() {
         let a = Matrix4::IDENTITY.transpose();
         assert_eq!(a, Matrix4::IDENTITY);
+    }
+
+    #[test]
+    fn determinant_2x2_matrix() {
+        let a = Matrix2::new(1.0, 5.0,
+                                -3.0, 2.0);
+        assert_eq!(a.determinant(), 17.0);
+    }
+
+    #[test]
+    fn submatrix_of_3x3_matrix_is_2x2_matrix() {
+        let a = Matrix3::new(
+            1.0, 5.0, 0.0,
+            -3.0, 2.0, 7.0,
+            0.0, 6.0, -3.0
+        );
+        assert_eq!(a.sub_matrix(0, 2), Matrix2::new(
+                                        -3.0, 2.0,
+                                        0.0, 6.0));
+    }
+
+    #[test]
+    fn submatrix_of_4x4_matrix_is_3x3_matrix() {
+        let a = Matrix4::new(
+            -6.0, 1.0, 1.0, 6.0,
+            -8.0, 5.0, 8.0, 6.0,
+            -1.0, 0.0, 8.0, 2.0,
+            -7.0, 1.0, -1.0, 1.0
+        );
+        assert_eq!(a.sub_matrix(2, 1), Matrix3::new(
+                                        -6.0, 1.0, 6.0,
+                                        -8.0, 8.0, 6.0,
+                                        -7.0, -1.0, 1.0));
     }
 }
