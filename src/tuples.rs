@@ -15,7 +15,7 @@ pub type Color = Tuple;
 
 impl Tuple {
 
-    fn new(x: f32, y: f32, z: f32, w: f32) -> Tuple {
+    pub fn new(x: f32, y: f32, z: f32, w: f32) -> Tuple {
         Tuple {
             x, y, z, w,
         }
@@ -27,6 +27,14 @@ impl Tuple {
 
     pub fn y(&self) -> f32 {
         self.y
+    }
+
+    pub fn z(&self) -> f32 {
+        self.z
+    }
+
+    pub fn w(&self) -> f32 {
+        self.w
     }
 
     fn is_point(&self) -> bool {
