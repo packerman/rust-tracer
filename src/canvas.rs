@@ -1,7 +1,7 @@
+use crate::tuples::Tuple;
 use core::fmt::Error;
 use std::fmt::Write;
 
-use crate::tuples::color;
 use crate::tuples::Color;
 
 struct PpmFormatter {
@@ -64,7 +64,7 @@ impl Canvas {
         for _ in 0..height {
             let mut row = Vec::with_capacity(width);
             for _ in 0..width {
-                row.push(color(0.0, 0.0, 0.0));
+                row.push(Tuple::color(0.0, 0.0, 0.0));
             }
             pixels.push(row);
         }
@@ -116,7 +116,7 @@ mod tests {
         let c = Canvas::new(width, height);
         for x in 0..width {
             for y in 0..height {
-                assert_eq!(c.pixel_at(x, y), color(0.0, 0.0, 0.0));
+                assert_eq!(c.pixel_at(x, y), Tuple::color(0.0, 0.0, 0.0));
             }
         }
     }
@@ -124,7 +124,7 @@ mod tests {
     #[test]
     fn writing_pixels() {
         let mut c = Canvas::new(10, 20);
-        let red = color(1.0, 0.0, 0.0);
+        let red = Tuple::color(1.0, 0.0, 0.0);
         c.write_pixel(2, 3, red);
         assert_eq!(c.pixel_at(2, 3), red);
     }
@@ -143,9 +143,9 @@ mod tests {
     #[test]
     fn construsting_ppm_pixel_data() {
         let mut c = Canvas::new(5, 3);
-        let c1 = color(1.5, 0.0, 0.0);
-        let c2 = color(0.0, 0.5, 0.0);
-        let c3 = color(-0.5, 0.0, 1.0);
+        let c1 = Tuple::color(1.5, 0.0, 0.0);
+        let c2 = Tuple::color(0.0, 0.5, 0.0);
+        let c3 = Tuple::color(-0.5, 0.0, 1.0);
 
         c.write_pixel(0, 0, c1);
         c.write_pixel(2, 1, c2);
@@ -164,7 +164,7 @@ mod tests {
         let mut c = Canvas::new(10, 2);
         for x in 0..10 {
             for y in 0..2 {
-                c.write_pixel(x, y, color(1.0, 0.8, 0.6))
+                c.write_pixel(x, y, Tuple::color(1.0, 0.8, 0.6))
             }
         }
 

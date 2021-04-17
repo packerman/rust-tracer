@@ -1,6 +1,7 @@
 pub mod tuples;
 pub mod canvas;
 pub mod matrices;
+pub mod transformations;
 
 #[cfg(test)]
 mod tests {

@@ -5,11 +5,11 @@ use std::ops::Mul;
 use std::ops::Index;
 
 #[derive(PartialEq, Debug, Copy, Clone)]
-struct Matrix4([[f32;4];4]);
+pub struct Matrix4([[f32;4];4]);
 
 impl Matrix4 {
 
-    const fn new(m00: f32, m01: f32, m02: f32, m03: f32,
+    pub const fn new(m00: f32, m01: f32, m02: f32, m03: f32,
         m10: f32, m11: f32, m12: f32, m13: f32,
         m20: f32, m21: f32, m22: f32, m23: f32,
         m30: f32, m31: f32, m32: f32, m33: f32) -> Matrix4 {
@@ -62,7 +62,7 @@ impl Matrix4 {
         self.determinant() != 0.
     }
 
-    fn inverse(&self) -> Matrix4 {
+    pub fn inverse(&self) -> Matrix4 {
         let det = self.determinant();
         let mut result = [[0.; 4]; 4];
         for i in 0..4 {
