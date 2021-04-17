@@ -1,5 +1,6 @@
 pub mod tuples;
 pub mod canvas;
+pub mod matrices;
 
 #[cfg(test)]
 mod tests {
