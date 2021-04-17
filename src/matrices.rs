@@ -41,6 +41,21 @@ impl Matrix4 {
         }
         Matrix3 { 0 : result }
     }
+
+    fn minor(&self, l: usize, k: usize) -> f32 {
+        self.sub_matrix(l, k).determinant()
+    }
+
+    fn cofactor(&self, l: usize, k: usize) -> f32 {
+        (if l + k % 2 == 0 { 1.0 } else { -1.0 })*self.minor(l, k)
+    }
+
+    fn determinant(&self) -> f32 {
+        self.0[0][0] * self.cofactor(0, 0) +
+        self.0[0][1] * self.cofactor(0, 1) +
+        self.0[0][2] * self.cofactor(0, 2) +
+        self.0[0][3] * self.cofactor(0, 3)
+    }
 }
 
 impl Index<(usize, usize)> for Matrix4 {
@@ -130,6 +145,18 @@ impl Matrix3 {
             }
         }
         Matrix2 { 0 : result }
+    }
+
+    fn minor(&self, l: usize, k: usize) -> f32 {
+        self.sub_matrix(l, k).determinant()
+    }
+
+    fn cofactor(&self, l: usize, k: usize) -> f32 {
+        (if l + k % 2 == 0 { 1.0 } else { -1.0 })*self.minor(l, k)
+    }
+
+    fn determinant(&self) -> f32 {
+        self.0[0][0] * self.cofactor(0, 0) + self.0[0][1] * self.cofactor(0, 1) + self.0[0][2] * self.cofactor(0, 2)
     }
 }
 
@@ -273,5 +300,61 @@ mod tests {
                                         -6.0, 1.0, 6.0,
                                         -8.0, 8.0, 6.0,
                                         -7.0, -1.0, 1.0));
+    }
+
+    #[test]
+    fn minor_of_3x3_matrix() {
+        let a = Matrix3::new(
+            3.0, 5.0, 0.0,
+            2.0, -1.0, -7.0,
+            6.0, -1.0, 5.0,
+        );
+        let b = a.sub_matrix(1, 0);
+
+        assert_eq!(b.determinant(), 25.0);
+        assert_eq!(a.minor(1, 0), 25.0);
+    }
+
+    #[test]
+    fn cofactor_of_3x3_matrix() {
+        let a = Matrix3::new(
+            3.0, 5.0, 0.0,
+            2.0, -1.0, -7.0,
+            6.0, -1.0, 5.0,
+        );
+
+        assert_eq!(a.minor(0, 0), -12.0);
+        assert_eq!(a.cofactor(0, 0), -12.0);
+        assert_eq!(a.minor(1, 0), 25.0);
+        assert_eq!(a.cofactor(1, 0), -25.0);
+    }
+
+    #[test]
+    fn determinant_of_3x3_matrix() {
+        let a = Matrix3::new(
+            1.0, 2.0, 6.0,
+            -5.0, 8.0, -4.0,
+            2.0, 6.0, 4.0
+        );
+        assert_eq!(a.cofactor(0, 0), 56.0);
+        assert_eq!(a.cofactor(0, 1), 12.0);
+        assert_eq!(a.cofactor(0, 2), -46.0);
+        assert_eq!(a.determinant(), -196.0);
+    }
+
+
+    #[test]
+    fn determinant_of_4x4_matrix() {
+        let a = Matrix4::new(
+            -2.0, -8.0, 3.0, 5.0,
+            -3.0, 1.0, 7.0, 3.0,
+            1.0, 2.0, -9.0, 6.0,
+            -6.0, 7.0, 7.0, -9.0
+        );
+        assert_eq!(a.cofactor(0, 0), 690.0);
+        assert_eq!(a.cofactor(0, 1), 447.0);
+        assert_eq!(a.cofactor(0, 2), 210.0);
+        assert_eq!(a.cofactor(0, 3), 51.0);
+        assert_eq!(a.determinant(), -4071.0);
     }
 }
