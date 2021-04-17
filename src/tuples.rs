@@ -163,7 +163,7 @@ impl AbsDiffEq for Tuple {
 mod tests {
 
     use super::*;
-    use approx::abs_diff_eq;
+    use approx::assert_abs_diff_eq;
 
     #[test]
     fn tuple_with_w_equals_1_is_point() {
@@ -305,14 +305,14 @@ mod tests {
     #[test]
     fn normalizing_vector_2() {
         let v = vector(1.0, 2.0, 3.0);
-        abs_diff_eq!(v.normalize(), vector(0.26726, 0.53452, 0.80178));
+        assert_abs_diff_eq!(v.normalize(), vector(0.26726, 0.53452, 0.80178), epsilon = 0.00001);
     }
 
     #[test]
     fn magnitude_of_normalized_vector() {
         let v = vector(1.0, 2.0, 3.0);
         let norm = v.normalize();
-        abs_diff_eq!(norm.magnitude(), 1.0);
+        assert_abs_diff_eq!(norm.magnitude(), 1.0);
     }
 
     #[test]
@@ -342,14 +342,14 @@ mod tests {
     fn adding_colors() {
         let c1 = color(0.9, 0.6, 0.75);
         let c2 = color(0.7, 0.1, 0.25);
-        abs_diff_eq!(c1 + c2, color(1.6, 0.7, 1.0));
+        assert_abs_diff_eq!(c1 + c2, color(1.6, 0.7, 1.0));
     }
 
     #[test]
     fn subtracting_colors() {
         let c1 = color(0.9, 0.6, 0.75);
         let c2 = color(0.7, 0.1, 0.25);
-        abs_diff_eq!(c1 - c2, color(0.2, 0.5, 0.5));
+        assert_abs_diff_eq!(c1 - c2, color(0.2, 0.5, 0.5));
     }
 
     #[test]
@@ -362,6 +362,6 @@ mod tests {
     fn multiplying_colors() {
         let c1 = color(1.0, 0.2, 0.4);
         let c2 = color(0.9, 1.0, 0.1);
-        abs_diff_eq!(c1 * c2, color(0.9, 0.2, 0.04));
+        assert_abs_diff_eq!(c1 * c2, color(0.9, 0.2, 0.04));
     }
 }

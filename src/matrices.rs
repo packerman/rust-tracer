@@ -1,4 +1,5 @@
 
+use approx::AbsDiffEq;
 use crate::tuples::Tuple;
 use std::ops::Mul;
 use std::ops::Index;
@@ -47,7 +48,7 @@ impl Matrix4 {
     }
 
     fn cofactor(&self, l: usize, k: usize) -> f32 {
-        (if l + k % 2 == 0 { 1.0 } else { -1.0 })*self.minor(l, k)
+        (if (l + k) % 2 == 0 { 1.0 } else { -1.0 }) * self.minor(l, k)
     }
 
     fn determinant(&self) -> f32 {
@@ -55,6 +56,21 @@ impl Matrix4 {
         self.0[0][1] * self.cofactor(0, 1) +
         self.0[0][2] * self.cofactor(0, 2) +
         self.0[0][3] * self.cofactor(0, 3)
+    }
+
+    fn is_invertible(&self) -> bool {
+        self.determinant() != 0.
+    }
+
+    fn inverse(&self) -> Matrix4 {
+        let det = self.determinant();
+        let mut result = [[0.; 4]; 4];
+        for i in 0..4 {
+            for j in 0..4 {
+                result[j][i] = self.cofactor(i, j) / det;
+            }
+        }
+        Matrix4 { 0: result }
     }
 }
 
@@ -97,6 +113,26 @@ impl Mul<Tuple> for Matrix4 {
             self.0[3][0] * other.x() + self.0[3][1] * other.y() + self.0[3][2] * other.z() + self.0[3][3] * other.w()
         )
      }
+}
+
+impl AbsDiffEq for Matrix4 {
+
+    type Epsilon = f32;
+
+    fn default_epsilon() -> Self::Epsilon {
+        f32::default_epsilon()
+    }
+
+    fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
+        for i in 0..4 {
+            for j in 0..4 {
+                if !self.0[i][j].abs_diff_eq(&other.0[i][j], epsilon) {
+                    return false;
+                }
+            }
+        }
+        true
+    }
 }
 
 #[derive(PartialEq, Debug)]
@@ -152,7 +188,7 @@ impl Matrix3 {
     }
 
     fn cofactor(&self, l: usize, k: usize) -> f32 {
-        (if l + k % 2 == 0 { 1.0 } else { -1.0 })*self.minor(l, k)
+        (if (l + k) % 2 == 0 { 1.0 } else { -1.0 }) * self.minor(l, k)
     }
 
     fn determinant(&self) -> f32 {
@@ -173,6 +209,7 @@ impl Index<(usize, usize)> for Matrix3 {
 mod tests {
 
     use super::*;
+    use approx::assert_abs_diff_eq;
     use crate::tuples::Tuple;
 
     #[test]
@@ -386,5 +423,47 @@ mod tests {
         assert_eq!(a.cofactor(0, 2), 210.0);
         assert_eq!(a.cofactor(0, 3), 51.0);
         assert_eq!(a.determinant(), -4071.0);
+    }
+
+    #[test]
+    fn testing_inveritble_matrix_for_invertibility() {
+        let a = Matrix4::new(
+                    6., 4., 4., 4.,
+                    5., 5., 7., 6.,
+                    4., -9., 3., -7.,
+                    9., 1., 7., -6.);
+        assert_eq!(a.determinant(), -2120.);
+        assert!(a.is_invertible());
+    }
+
+    #[test]
+    fn testing_non_inveritble_matrix_for_invertibility() {
+        let a = Matrix4::new(
+                    -4., 2., -3., -3.,
+                    9., 6., 2., 6.,
+                    0., -5., 1., -5.,
+                    0., 0., 0., -0.);
+        assert_eq!(a.determinant(), -0.);
+        assert!(!a.is_invertible());
+    }
+
+    #[test]
+    fn inverse_of_matrix() {
+        let a = Matrix4::new(
+                    -5., 2., 6., -8.,
+                    1., -5., 1., 8.,
+                    7., 7., -6., -7.,
+                    1., -3., 7., 4.);
+        let b = a.inverse();
+
+        assert_eq!(a.determinant(), 532.);
+        assert_eq!(a.cofactor(2, 3), -160.);
+        assert_eq!(b[(3, 2)], -160. / 532.);
+        assert_eq!(a.cofactor(3, 2), 105.);
+        assert_eq!(b[(2, 3)], 105. / 532.);
+        assert_abs_diff_eq!(b, Matrix4::new(0.21805, 0.45113, 0.24060, -0.04511,
+                                            -0.80827, -1.45677, -0.44361, 0.52068,
+                                            -0.07895, -0.22368, -0.05263, 0.19737,
+                                            -0.52256, -0.81391, -0.30075, 0.30639), epsilon=0.00001);
     }
 }
