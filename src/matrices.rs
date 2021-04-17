@@ -3,12 +3,12 @@ use crate::tuples::Tuple;
 use std::ops::Mul;
 use std::ops::Index;
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Copy, Clone)]
 struct Matrix4([[f32;4];4]);
 
 impl Matrix4 {
 
-    fn new(m00: f32, m01: f32, m02: f32, m03: f32,
+    const fn new(m00: f32, m01: f32, m02: f32, m03: f32,
         m10: f32, m11: f32, m12: f32, m13: f32,
         m20: f32, m21: f32, m22: f32, m23: f32,
         m30: f32, m31: f32, m32: f32, m33: f32) -> Matrix4 {
@@ -16,6 +16,11 @@ impl Matrix4 {
                 0: [[m00, m01, m02, m03], [m10, m11, m12, m13], [m20, m21, m22, m23], [m30, m31, m32, m33]],
             }
         }
+
+    const IDENTITY: Matrix4 = Matrix4::new(1.0, 0.0, 0.0, 0.0,
+                                            0.0, 1.0, 0.0, 0.0,
+                                            0.0, 0.0, 1.0, 0.0,
+                                            0.0, 0.0, 0.0, 1.0);
 }
 
 impl Index<(usize, usize)> for Matrix4 {
@@ -166,5 +171,17 @@ mod tests {
         let b = Tuple::new(1.0, 2.0, 3.0, 1.0);
 
         assert_eq!(a * b, Tuple::new(18.0, 24.0, 33.0, 1.0));
+    }
+
+    #[test]
+    fn multiplying_matrix_by_identity_matrix() {
+        let a = Matrix4::new(0.0, 1.0, 2.0, 4.0, 1.0, 2.0, 4.0, 8.0, 2.0, 4.0, 8.0, 16.0, 4.0, 8.0, 16.0, 32.0);
+        assert_eq!(a * Matrix4::IDENTITY, a);
+    }
+
+    #[test]
+    fn multiplying_identity_matrix_by_tuple() {
+        let a = Tuple::new(1.0, 2.0, 3.0, 4.0);
+        assert_eq!(Matrix4::IDENTITY * a, a);
     }
 }
