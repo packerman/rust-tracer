@@ -39,6 +39,13 @@ impl Transformation {
                         0., 0., 1., 0.,
                         0., 0., 0., 1.)
     }
+
+    fn shearing(x_y: f32, x_z: f32, y_x: f32, y_z: f32, z_x: f32, z_y: f32) -> Transformation {
+        Matrix4::new(1., x_y, x_z, 0.,
+            y_x, 1., y_z, 0.,
+            z_x, z_y, 1., 0.,
+            0., 0., 0., 1.)
+    }
 }
 
 #[cfg(test)]
@@ -144,5 +151,47 @@ mod tests {
 
         assert_abs_diff_eq!(half_quarter * p, Tuple::point(- SQRT_2 / 2., SQRT_2 / 2., 0.));
         assert_abs_diff_eq!(full_quarter * p, Tuple::point(- 1., 0., 0.));
+    }
+
+    #[test]
+    fn shearing_transformation_moves_x_in_proportion_to_y() {
+        let transform = Transformation::shearing(1., 0., 0., 0., 0., 0.);
+        let p = Tuple::point(2., 3., 4.);
+        assert_eq!(transform * p, Tuple::point(5., 3., 4.));
+    }
+
+    #[test]
+    fn shearing_transformation_moves_x_in_proportion_to_z() {
+        let transform = Transformation::shearing(0., 1., 0., 0., 0., 0.);
+        let p = Tuple::point(2., 3., 4.);
+        assert_eq!(transform * p, Tuple::point(6., 3., 4.));
+    }
+
+    #[test]
+    fn shearing_transformation_moves_y_in_proportion_to_x() {
+        let transform = Transformation::shearing(0., 0., 1., 0., 0., 0.);
+        let p = Tuple::point(2., 3., 4.);
+        assert_eq!(transform * p, Tuple::point(2., 5., 4.));
+    }
+
+    #[test]
+    fn shearing_transformation_moves_y_in_proportion_to_z() {
+        let transform = Transformation::shearing(0., 0., 0., 1., 0., 0.);
+        let p = Tuple::point(2., 3., 4.);
+        assert_eq!(transform * p, Tuple::point(2., 7., 4.));
+    }
+
+    #[test]
+    fn shearing_transformation_moves_z_in_proportion_to_x() {
+        let transform = Transformation::shearing(0., 0., 0., 0., 1., 0.);
+        let p = Tuple::point(2., 3., 4.);
+        assert_eq!(transform * p, Tuple::point(2., 3., 6.));
+    }
+
+    #[test]
+    fn shearing_transformation_moves_z_in_proportion_to_y() {
+        let transform = Transformation::shearing(0., 0., 0., 0., 0., 1.);
+        let p = Tuple::point(2., 3., 4.);
+        assert_eq!(transform * p, Tuple::point(2., 3., 7.));
     }
 }
