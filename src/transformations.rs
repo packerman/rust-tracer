@@ -18,13 +18,36 @@ impl Transformation {
                     0., 0., z, 0.,
                     0., 0., 0., 1.)
     }
+
+    fn rotation_x(r: f32) -> Transformation {
+        Matrix4::new(1., 0., 0., 0.,
+                        0., r.cos(), - r.sin(), 0.,
+                        0., r.sin(), r.cos(), 0.,
+                        0., 0., 0., 1.)
+    }
+
+    fn rotation_y(r: f32) -> Transformation {
+        Matrix4::new(r.cos(), 0., r.sin(), 0.,
+                        0., 1., 0., 0.,
+                        - r.sin(), 0., r.cos(), 0.,
+                        0., 0., 0., 1.)
+    }
+
+    fn rotation_z(r: f32) -> Transformation {
+        Matrix4::new(r.cos(), - r.sin(), 0., 0.,
+                        r.sin(), r.cos(), 0., 0.,
+                        0., 0., 1., 0.,
+                        0., 0., 0., 1.)
+    }
 }
 
 #[cfg(test)]
 mod tests {
 
+    use std::f32::consts::*;
     use crate::tuples::Tuple;
     use super::*;
+    use approx::assert_abs_diff_eq;
 
     #[test]
     fn multiplying_by_translation_matrix() {
@@ -82,5 +105,44 @@ mod tests {
         let p = Tuple::point(2., 3., 4.);
 
         assert_eq!(transform * p, Tuple::point(-2., 3., 4.));
+    }
+
+    #[test]
+    fn rotating_point_around_x_axis() {
+        let p = Tuple::point(0., 1., 0.);
+        let half_quarter = Transformation::rotation_x(FRAC_PI_4);
+        let full_quarter = Transformation::rotation_x(FRAC_PI_2);
+
+        assert_abs_diff_eq!(half_quarter * p, Tuple::point(0., SQRT_2/2., SQRT_2/2.));
+        assert_abs_diff_eq!(full_quarter * p, Tuple::point(0., 0., 1.));
+    }
+
+    #[test]
+    fn rotating_point_around_x_axis_reverse() {
+        let p = Tuple::point(0., 1., 0.);
+        let half_quarter = Transformation::rotation_x(FRAC_PI_4);
+        let inv = half_quarter.inverse();
+
+        assert_abs_diff_eq!(inv * p, Tuple::point(0., SQRT_2 / 2., - SQRT_2 / 2.));
+    }
+
+    #[test]
+    fn rotating_around_y_axis() {
+        let p = Tuple::point(0., 0., 1.);
+        let half_quarter = Transformation::rotation_y(FRAC_PI_4);
+        let full_quarter = Transformation::rotation_y(FRAC_PI_2);
+
+        assert_abs_diff_eq!(half_quarter * p, Tuple::point(SQRT_2 / 2., 0., SQRT_2 / 2.));
+        assert_abs_diff_eq!(full_quarter * p, Tuple::point(1., 0., 0.));
+    }
+
+    #[test]
+    fn rotating_around_z_axis() {
+        let p = Tuple::point(0., 1., 0.);
+        let half_quarter = Transformation::rotation_z(FRAC_PI_4);
+        let full_quarter = Transformation::rotation_z(FRAC_PI_2);
+
+        assert_abs_diff_eq!(half_quarter * p, Tuple::point(- SQRT_2 / 2., SQRT_2 / 2., 0.));
+        assert_abs_diff_eq!(full_quarter * p, Tuple::point(- 1., 0., 0.));
     }
 }
