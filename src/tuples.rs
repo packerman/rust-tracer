@@ -21,6 +21,14 @@ impl Tuple {
         }
     }
 
+    pub fn point(x: f32, y: f32, z: f32) -> Point {
+        Tuple::new(x, y, z, 1.0)
+    }
+
+    pub fn vector(x: f32, y: f32, z: f32) -> Vector {
+        Tuple::new(x, y, z, 0.0)
+    }
+
     pub fn x(&self) -> f32 {
         self.x
     }
@@ -37,11 +45,11 @@ impl Tuple {
         self.w
     }
 
-    fn is_point(&self) -> bool {
+    pub fn is_point(&self) -> bool {
         self.w == 1.0
     }
 
-    fn is_vector(&self) -> bool {
+    pub fn is_vector(&self) -> bool {
         self.w == 0.0
     }
 
@@ -54,14 +62,18 @@ impl Tuple {
         Tuple::new(self.x / m, self.y / m, self.z / m, self.w / m)
     }
 
-    fn dot(&self, other: &Tuple) -> f32 {
+    pub fn dot(&self, other: &Tuple) -> f32 {
         self.x*other.x + self.y*other.y + self.z*other.z + self.w*other.w
     }
 
-    fn cross(&self, other: &Tuple) -> Vector {
-        vector(self.y*other.z - self.z*other.y,
-            self.z*other.x - self.x*other.z,
-            self.x*other.y - self.y*other.x)
+    pub fn cross(&self, other: &Tuple) -> Vector {
+        Self::vector(self.y*other.z - self.z*other.y,
+                        self.z*other.x - self.x*other.z,
+                        self.x*other.y - self.y*other.x)
+    }
+
+    pub fn color(x: f32, y: f32, z: f32) -> Color {
+        Tuple::new(x, y, z, 0.0)
     }
 
     pub fn red(&self) -> f32 {
@@ -75,18 +87,6 @@ impl Tuple {
     pub fn blue(&self) -> f32 {
         self.z
     }
-}
-
-pub fn point(x: f32, y: f32, z: f32) -> Point {
-    Tuple::new(x, y, z, 1.0)
-}
-
-pub fn vector(x: f32, y: f32, z: f32) -> Vector {
-    Tuple::new(x, y, z, 0.0)
-}
-
-pub fn color(x: f32, y: f32, z: f32) -> Color {
-    Tuple::new(x, y, z, 0.0)
 }
 
 impl ops::Add<Tuple> for Tuple {
@@ -193,13 +193,13 @@ mod tests {
 
     #[test]
     fn create_point_tuple() {
-        let p = point(4.0, -4.0, 3.0);
+        let p = Tuple::point(4.0, -4.0, 3.0);
         assert_eq!(p, Tuple::new(4.0, -4.0, 3.0, 1.0))
     }
 
     #[test]
     fn create_vector_tuple() {
-        let p = vector(4.0, -4.0, 3.0);
+        let p = Tuple::vector(4.0, -4.0, 3.0);
         assert_eq!(p, Tuple::new(4.0, -4.0, 3.0, 0.0))
     }
 
@@ -213,33 +213,33 @@ mod tests {
 
     #[test]
     fn subtracting_two_points() {
-        let p1 = point(3.0, 2.0, 1.0);
-        let p2 = point(5.0, 6.0, 7.0);
+        let p1 = Tuple::point(3.0, 2.0, 1.0);
+        let p2 = Tuple::point(5.0, 6.0, 7.0);
 
-        assert_eq!(p1 - p2, vector(-2.0, -4.0, -6.0));
+        assert_eq!(p1 - p2, Tuple::vector(-2.0, -4.0, -6.0));
     }
 
     #[test]
     fn subtracting_vector_from_point() {
-        let p = point(3.0, 2.0, 1.0);
-        let v = vector(5.0, 6.0, 7.0);
+        let p = Tuple::point(3.0, 2.0, 1.0);
+        let v = Tuple::vector(5.0, 6.0, 7.0);
 
-        assert_eq!(p - v, point(-2.0, -4.0, -6.0));
+        assert_eq!(p - v, Tuple::point(-2.0, -4.0, -6.0));
     }
 
     #[test]
     fn subtracting_two_vectors() {
-        let v1 = vector(3.0, 2.0, 1.0);
-        let v2 = vector(5.0, 6.0, 7.0);
+        let v1 = Tuple::vector(3.0, 2.0, 1.0);
+        let v2 = Tuple::vector(5.0, 6.0, 7.0);
 
-        assert_eq!(v1 - v2, vector(-2.0, -4.0, -6.0));
+        assert_eq!(v1 - v2, Tuple::vector(-2.0, -4.0, -6.0));
     }
 
     #[test]
     fn subtracting_vector_from_zero_vector() {
-        let zero = vector(0.0, 0.0, 0.0);
-        let v = vector(1.0, -2.0, 3.0);
-        assert_eq!(zero - v, vector(-1.0, 2.0, -3.0));
+        let zero = Tuple::vector(0.0, 0.0, 0.0);
+        let v = Tuple::vector(1.0, -2.0, 3.0);
+        assert_eq!(zero - v, Tuple::vector(-1.0, 2.0, -3.0));
     }
 
     #[test]
@@ -268,71 +268,71 @@ mod tests {
 
     #[test]
     fn computing_magnitude_of_vector_1() {
-        let v = vector(1.0, 0.0, 0.0);
+        let v = Tuple::vector(1.0, 0.0, 0.0);
         assert_eq!(v.magnitude(), 1.0);
     }
 
     #[test]
     fn computing_magnitude_of_vector_2() {
-        let v = vector(0.0, 1.0, 0.0);
+        let v = Tuple::vector(0.0, 1.0, 0.0);
         assert_eq!(v.magnitude(), 1.0);
     }
 
     #[test]
     fn computing_magnitude_of_vector_3() {
-        let v = vector(0.0, 0.0, 1.0);
+        let v = Tuple::vector(0.0, 0.0, 1.0);
         assert_eq!(v.magnitude(), 1.0);
     }
 
     #[test]
     fn computing_magnitude_of_vector_4() {
-        let v = vector(1.0, 2.0, 3.0);
+        let v = Tuple::vector(1.0, 2.0, 3.0);
         assert_eq!(v.magnitude(), 14.0_f32.sqrt());
     }
 
     #[test]
     fn computing_magnitude_of_vector_5() {
-        let v = vector(-1.0, -2.0, -3.0);
+        let v = Tuple::vector(-1.0, -2.0, -3.0);
         assert_eq!(v.magnitude(), 14.0_f32.sqrt());
     }
 
     #[test]
     fn normalizing_vector_1() {
-        let v = vector(4.0, 0.0, 0.0);
-        assert_eq!(v.normalize(), vector(1.0, 0.0, 0.0));
+        let v = Tuple::vector(4.0, 0.0, 0.0);
+        assert_eq!(v.normalize(), Tuple::vector(1.0, 0.0, 0.0));
     }
 
     #[test]
     fn normalizing_vector_2() {
-        let v = vector(1.0, 2.0, 3.0);
-        assert_abs_diff_eq!(v.normalize(), vector(0.26726, 0.53452, 0.80178), epsilon = 0.00001);
+        let v = Tuple::vector(1.0, 2.0, 3.0);
+        assert_abs_diff_eq!(v.normalize(), Tuple::vector(0.26726, 0.53452, 0.80178), epsilon = 0.00001);
     }
 
     #[test]
     fn magnitude_of_normalized_vector() {
-        let v = vector(1.0, 2.0, 3.0);
+        let v = Tuple::vector(1.0, 2.0, 3.0);
         let norm = v.normalize();
         assert_abs_diff_eq!(norm.magnitude(), 1.0);
     }
 
     #[test]
     fn dot_product_of_two_tuples() {
-        let a = vector(1.0, 2.0, 3.0);
-        let b = vector(2.0, 3.0, 4.0);
+        let a = Tuple::vector(1.0, 2.0, 3.0);
+        let b = Tuple::vector(2.0, 3.0, 4.0);
         assert_eq!(a.dot(&b), 20.0);
     }
 
     #[test]
     fn cross_product_of_two_vectors() {
-        let a = vector(1.0, 2.0, 3.0);
-        let b = vector(2.0, 3.0, 4.0);
-        assert_eq!(a.cross(&b), vector(-1.0, 2.0, -1.0));
-        assert_eq!(b.cross(&a), vector(1.0, -2.0, 1.0));
+        let a = Tuple::vector(1.0, 2.0, 3.0);
+        let b = Tuple::vector(2.0, 3.0, 4.0);
+        assert_eq!(a.cross(&b), Tuple::vector(-1.0, 2.0, -1.0));
+        assert_eq!(b.cross(&a), Tuple::vector(1.0, -2.0, 1.0));
     }
 
     #[test]
     fn create_color() {
-        let c = color(-0.5, 0.4, 1.7);
+        let c = Tuple::color(-0.5, 0.4, 1.7);
         assert_eq!(c.red(), -0.5);
         assert_eq!(c.green(), 0.4);
         assert_eq!(c.blue(), 1.7);
@@ -340,28 +340,28 @@ mod tests {
 
     #[test]
     fn adding_colors() {
-        let c1 = color(0.9, 0.6, 0.75);
-        let c2 = color(0.7, 0.1, 0.25);
-        assert_abs_diff_eq!(c1 + c2, color(1.6, 0.7, 1.0));
+        let c1 = Tuple::color(0.9, 0.6, 0.75);
+        let c2 = Tuple::color(0.7, 0.1, 0.25);
+        assert_abs_diff_eq!(c1 + c2, Tuple::color(1.6, 0.7, 1.0));
     }
 
     #[test]
     fn subtracting_colors() {
-        let c1 = color(0.9, 0.6, 0.75);
-        let c2 = color(0.7, 0.1, 0.25);
-        assert_abs_diff_eq!(c1 - c2, color(0.2, 0.5, 0.5));
+        let c1 = Tuple::color(0.9, 0.6, 0.75);
+        let c2 = Tuple::color(0.7, 0.1, 0.25);
+        assert_abs_diff_eq!(c1 - c2, Tuple::color(0.2, 0.5, 0.5));
     }
 
     #[test]
     fn multiplying_color_by_scalar() {
-        let c = color(0.2, 0.3, 0.4);
-        assert_eq!(c * 2.0, color(0.4, 0.6, 0.8));
+        let c = Tuple::color(0.2, 0.3, 0.4);
+        assert_eq!(c * 2.0, Tuple::color(0.4, 0.6, 0.8));
     }
 
     #[test]
     fn multiplying_colors() {
-        let c1 = color(1.0, 0.2, 0.4);
-        let c2 = color(0.9, 1.0, 0.1);
-        assert_abs_diff_eq!(c1 * c2, color(0.9, 0.2, 0.04));
+        let c1 = Tuple::color(1.0, 0.2, 0.4);
+        let c2 = Tuple::color(0.9, 1.0, 0.1);
+        assert_abs_diff_eq!(c1 * c2, Tuple::color(0.9, 0.2, 0.04));
     }
 }
