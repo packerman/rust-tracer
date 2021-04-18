@@ -16,3 +16,7 @@ path = "src/lib.rs"
 [[bin]]
 name = "projectile"
 path = "src/examples/projectile.rs"
+
+[[bin]]
+name = "clock"
+path = "src/examples/clock.rs"

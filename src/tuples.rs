@@ -45,11 +45,11 @@ impl Tuple {
         self.w
     }
 
-    fn is_point(&self) -> bool {
+    pub fn is_point(&self) -> bool {
         self.w == 1.0
     }
 
-    fn is_vector(&self) -> bool {
+    pub fn is_vector(&self) -> bool {
         self.w == 0.0
     }
 
@@ -62,11 +62,11 @@ impl Tuple {
         Tuple::new(self.x / m, self.y / m, self.z / m, self.w / m)
     }
 
-    fn dot(&self, other: &Tuple) -> f32 {
+    pub fn dot(&self, other: &Tuple) -> f32 {
         self.x*other.x + self.y*other.y + self.z*other.z + self.w*other.w
     }
 
-    fn cross(&self, other: &Tuple) -> Vector {
+    pub fn cross(&self, other: &Tuple) -> Vector {
         Self::vector(self.y*other.z - self.z*other.y,
                         self.z*other.x - self.x*other.z,
                         self.x*other.y - self.y*other.x)
