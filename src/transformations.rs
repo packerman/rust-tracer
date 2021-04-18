@@ -194,4 +194,31 @@ mod tests {
         let p = Tuple::point(2., 3., 4.);
         assert_eq!(transform * p, Tuple::point(2., 3., 7.));
     }
+
+    #[test]
+    fn individual_transformations_are_applied_in_sequence() {
+        let p = Tuple::point(1., 0., 1.);
+        let a = Transformation::rotation_x(FRAC_PI_2);
+        let b = Transformation::scaling(5., 5., 5.);
+        let c = Transformation::translation(10., 5., 7.);
+
+        let p2 = a * p;
+        assert_abs_diff_eq!(p2, Tuple::point(1., -1., 0.));
+        let p3 = b * p2;
+        assert_abs_diff_eq!(p3, Tuple::point(5., -5., 0.), epsilon = 0.000001);
+        let p4 = c * p3;
+        assert_eq!(p4, Tuple::point(15., 0., 7.));
+    }
+
+    #[test]
+    fn chained_transformations_must_be_applied_in_reverse_order() {
+        let p = Tuple::point(1., 0., 1.);
+        let a = Transformation::rotation_x(FRAC_PI_2);
+        let b = Transformation::scaling(5., 5., 5.);
+        let c = Transformation::translation(10., 5., 7.);
+
+        let t = c * b * a;
+
+        assert_eq!(t * p, Tuple::point(15., 0., 7.));
+    }
 }
