@@ -1,7 +1,7 @@
 use crate::tuples::Vector;
 use crate::tuples::Point;
 
-struct Ray {
+pub struct Ray {
     origin: Point,
     direction: Vector,
 }
@@ -15,6 +15,14 @@ impl Ray {
         }
     }
 
+    pub fn origin(&self) -> Point {
+        self.origin
+    }
+
+    pub fn direction(&self) -> Point {
+        self.direction
+    }
+
     pub fn position(&self, t: f32) -> Point {
         self.origin + self.direction * t
     }
@@ -26,26 +34,24 @@ mod tests {
     use super::*;
     use crate::tuples::Tuple;
 
-#[test]
-fn creating_ray() {
-    let origin = Tuple::point(1., 2., 3.);
-    let direction = Tuple::vector(4., 5., 6.);
+    #[test]
+    fn creating_ray() {
+        let origin = Tuple::point(1., 2., 3.);
+        let direction = Tuple::vector(4., 5., 6.);
 
-    let r = Ray::new(origin, direction);
+        let r = Ray::new(origin, direction);
 
-    assert_eq!(r.origin, origin);
-    assert_eq!(r.direction, direction);
-}
+        assert_eq!(r.origin(), origin);
+        assert_eq!(r.direction(), direction);
+    }
 
-#[test]
-fn computing_a_point_from_distance() {
-    let r = Ray::new(Tuple::point(2., 3., 4.), Tuple::vector(1., 0., 0.));
+    #[test]
+    fn computing_a_point_from_distance() {
+        let r = Ray::new(Tuple::point(2., 3., 4.), Tuple::vector(1., 0., 0.));
 
-    assert_eq!(r.position(0.), Tuple::point(2., 3., 4.));
-    assert_eq!(r.position(1.), Tuple::point(3., 3., 4.));
-    assert_eq!(r.position(-1.), Tuple::point(1., 3., 4.));
-    assert_eq!(r.position(2.5), Tuple::point(4.5, 3., 4.));
-}
-
-
+        assert_eq!(r.position(0.), Tuple::point(2., 3., 4.));
+        assert_eq!(r.position(1.), Tuple::point(3., 3., 4.));
+        assert_eq!(r.position(-1.), Tuple::point(1., 3., 4.));
+        assert_eq!(r.position(2.5), Tuple::point(4.5, 3., 4.));
+    }
 }
