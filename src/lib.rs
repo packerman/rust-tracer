@@ -4,6 +4,7 @@ pub mod matrices;
 pub mod transformations;
 pub mod rays;
 pub mod spheres;
+pub mod intersections;
 
 #[cfg(test)]
 mod tests {

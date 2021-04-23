@@ -1,7 +1,7 @@
 use crate::tuples::Tuple;
 use crate::rays::Ray;
 
-struct Sphere {}
+pub struct Sphere {}
 
 impl Sphere {
 
