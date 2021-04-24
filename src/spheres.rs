@@ -1,3 +1,4 @@
+use crate::intersections::Intersection;
 use crate::tuples::Tuple;
 use crate::rays::Ray;
 
@@ -9,7 +10,7 @@ impl Sphere {
         Sphere { }
     }
 
-    pub fn intersect(&self, ray: &Ray) -> Vec<f32> {
+    pub fn intersect(&self, ray: &Ray) -> Vec<Intersection> {
         let sphere_to_ray = ray.origin() - Tuple::point(0., 0., 0.);
 
         let a = ray.direction().dot(&ray.direction());
@@ -24,7 +25,8 @@ impl Sphere {
             let t1 = (- b - discriminant.sqrt()) / (2. * a);
             let t2 = (- b + discriminant.sqrt()) / (2. * a);
 
-            vec![t1, t2]
+            vec![Intersection::new(t1, &self),
+                Intersection::new(t2, &self)]
         }
     }
 }
@@ -34,6 +36,7 @@ mod tests {
 
     use crate::tuples::Tuple;
     use super::*;
+    use std::ptr;
 
     #[test]
     fn ray_intersects_sphere_at_two_point() {
@@ -41,8 +44,8 @@ mod tests {
         let s = Sphere::new();
         let xs = s.intersect(&r);
         assert_eq!(xs.len(), 2);
-        assert_eq!(xs[0], 4.);
-        assert_eq!(xs[1], 6.);
+        assert_eq!(xs[0].t(), 4.);
+        assert_eq!(xs[1].t(), 6.);
     }
 
     #[test]
@@ -51,8 +54,8 @@ mod tests {
         let s = Sphere::new();
         let xs = s.intersect(&r);
         assert_eq!(xs.len(), 2);
-        assert_eq!(xs[0], 5.);
-        assert_eq!(xs[1], 5.);
+        assert_eq!(xs[0].t(), 5.);
+        assert_eq!(xs[1].t(), 5.);
     }
 
     #[test]
@@ -69,8 +72,8 @@ mod tests {
         let s = Sphere::new();
         let xs = s.intersect(&r);
         assert_eq!(xs.len(), 2);
-        assert_eq!(xs[0], -1.);
-        assert_eq!(xs[1], 1.);
+        assert_eq!(xs[0].t(), -1.);
+        assert_eq!(xs[1].t(), 1.);
     }
 
     #[test]
@@ -79,7 +82,19 @@ mod tests {
         let s = Sphere::new();
         let xs = s.intersect(&r);
         assert_eq!(xs.len(), 2);
-        assert_eq!(xs[0], -6.);
-        assert_eq!(xs[1], -4.);
+        assert_eq!(xs[0].t(), -6.);
+        assert_eq!(xs[1].t(), -4.);
+    }
+
+    #[test]
+    fn intersect_sets_the_object_on_the_intersection() {
+        let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
+        let s = Sphere::new();
+
+        let xs = s.intersect(&r);
+
+        assert_eq!(xs.len(), 2);
+        assert!(ptr::eq(xs[0].object(), &s));
+        assert!(ptr::eq(xs[1].object(), &s));
     }
 }

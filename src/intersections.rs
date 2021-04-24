@@ -1,7 +1,6 @@
-use std::ptr;
 use crate::spheres::Sphere;
 
-struct Intersection<'a> {
+pub struct Intersection<'a> {
     t: f32,
     object: &'a Sphere,
 }
@@ -19,8 +18,6 @@ impl Intersection<'_> {
     pub fn object(&self) -> &Sphere {
         return self.object
     }
-
-
 }
 
 
@@ -28,6 +25,7 @@ impl Intersection<'_> {
 mod tests {
 
     use super::*;
+    use std::ptr;
 
     #[test]
     fn creating_intersection() {
