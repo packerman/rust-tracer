@@ -1,3 +1,4 @@
+use crate::transformations::Transformation;
 use crate::tuples::Vector;
 use crate::tuples::Point;
 
@@ -26,11 +27,16 @@ impl Ray {
     pub fn position(&self, t: f32) -> Point {
         self.origin + self.direction * t
     }
+
+    fn transform(&self, m: &Transformation) -> Ray {
+        Ray::new(*m * self.origin, *m * self.direction)
+    }
 }
 
 #[cfg(test)]
 mod tests {
 
+    use crate::transformations::Transformation;
     use super::*;
     use crate::tuples::Tuple;
 
@@ -53,5 +59,27 @@ mod tests {
         assert_eq!(r.position(1.), Tuple::point(3., 3., 4.));
         assert_eq!(r.position(-1.), Tuple::point(1., 3., 4.));
         assert_eq!(r.position(2.5), Tuple::point(4.5, 3., 4.));
+    }
+
+    #[test]
+    fn translating_a_ray() {
+        let r = Ray::new(Tuple::point(1., 2., 3.), Tuple::vector(0., 1., 0.));
+        let m = Transformation::translation(3., 4., 5.);
+
+        let r2 = r.transform(&m);
+
+        assert_eq!(r2.origin(), Tuple::point(4., 6., 8.));
+        assert_eq!(r2.direction(), Tuple::vector(0., 1., 0.));
+    }
+
+    #[test]
+    fn scaling_a_ray() {
+        let r = Ray::new(Tuple::point(1., 2., 3.), Tuple::vector(0., 1., 0.));
+        let m = Transformation::scaling(2., 3., 4.);
+
+        let r2 = r.transform(&m);
+
+        assert_eq!(r2.origin(), Tuple::point(2., 6., 12.));
+        assert_eq!(r2.direction(), Tuple::vector(0., 3., 0.));
     }
 }
