@@ -2,6 +2,7 @@ use crate::intersections::Intersection;
 use crate::tuples::Tuple;
 use crate::rays::Ray;
 
+#[derive(Debug)]
 pub struct Sphere {}
 
 impl Sphere {
