@@ -28,7 +28,7 @@ impl Ray {
         self.origin + self.direction * t
     }
 
-    fn transform(&self, m: &Transformation) -> Ray {
+    pub fn transform(&self, m: &Transformation) -> Ray {
         Ray::new(*m * self.origin, *m * self.direction)
     }
 }
