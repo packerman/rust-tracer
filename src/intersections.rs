@@ -36,12 +36,12 @@ impl PartialOrd for Intersection<'_> {
      }
 }
 
-fn intersections<'a>(instersections: &'a mut [Intersection<'a>]) -> &'a[Intersection<'a>] {
+pub fn intersections<'a>(instersections: &'a mut [Intersection<'a>]) -> &'a[Intersection<'a>] {
     instersections.sort_by(|a, b| a.partial_cmp(b).unwrap());
     instersections
 }
 
-fn hit<'a>(intersections: &'a [Intersection<'a>]) -> Option<&'a Intersection<'a>> {
+pub fn hit<'a>(intersections: &'a [Intersection<'a>]) -> Option<&'a Intersection<'a>> {
     intersections.iter().find(|i| i.t() > 0.)
 }
 

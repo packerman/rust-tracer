@@ -6,13 +6,15 @@ use crate::transformations::Transformation;
 #[derive(Debug)]
 pub struct Sphere {
     transform: Transformation,
+    inversed_transform: Transformation,
 }
 
 impl Sphere {
 
     pub fn new() -> Sphere {
         Sphere {
-            transform: Transformation::IDENTITY
+            transform: Transformation::IDENTITY,
+            inversed_transform: Transformation::IDENTITY,
         }
     }
 
@@ -22,10 +24,11 @@ impl Sphere {
 
     pub fn set_transform(&mut self, transform: Transformation) {
         self.transform = transform;
+        self.inversed_transform = transform.inverse();
     }
 
     pub fn intersect(&self, ray: &Ray) -> Vec<Intersection> {
-        let ray2 = ray.transform(&self.transform().inverse());
+        let ray2 = ray.transform(&self.inversed_transform);
 
         let sphere_to_ray = ray2.origin() - Tuple::point(0., 0., 0.);
 
