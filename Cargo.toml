@@ -20,3 +20,7 @@ path = "src/examples/projectile.rs"
 [[bin]]
 name = "clock"
 path = "src/examples/clock.rs"
+
+[[bin]]
+name = "silhouette"
+path = "src/examples/silhouette.rs"
