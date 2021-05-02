@@ -45,6 +45,10 @@ impl Tuple {
         self.w
     }
 
+    pub fn set_w(&mut self, w: f32) {
+        self.w = w;
+    }
+
     pub fn is_point(&self) -> bool {
         self.w == 1.0
     }

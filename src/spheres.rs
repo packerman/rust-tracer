@@ -51,14 +51,19 @@ impl Sphere {
         }
     }
 
-    pub fn normal_at(&self, p: Point) -> Vector {
-        (p - Tuple::point(0., 0., 0.)).normalize()
+    pub fn normal_at(&self, world_point: Point) -> Vector {
+        let object_point = self.inversed_transform * world_point;
+        let object_normal = object_point - Tuple::point(0., 0., 0.);
+        let mut world_normal = self.inversed_transform.transpose() * object_normal;
+        world_normal.set_w(0.);
+        world_normal.normalize()
     }
 }
 
 #[cfg(test)]
 mod tests {
 
+    use std::f32::consts::PI;
     use crate::tuples::Tuple;
     use super::*;
     use std::ptr;
@@ -207,5 +212,26 @@ mod tests {
         let n = s.normal_at(Tuple::point(3_f32.sqrt() / 3., 3_f32.sqrt() / 3., 3_f32.sqrt() / 3.));
 
         assert_abs_diff_eq!(n, n.normalize());
+    }
+
+    #[test]
+    fn computing_normal_on_a_translated_sphere() {
+        let mut s = Sphere::new();
+        s.set_transform(Transformation::translation(0., 1., 0.));
+
+        let n = s.normal_at(Tuple::point(0., 1.70711, - 0.70711));
+
+        assert_abs_diff_eq!(n, Tuple::vector(0., 0.70711, - 0.70711), epsilon = 0.00001);
+    }
+
+    #[test]
+    fn computing_normal_on_a_transformed_sphere() {
+        let mut s = Sphere::new();
+        let m = Transformation::scaling(1., 0.5, 1.) * Transformation::rotation_z(PI / 5.);
+        s.set_transform(m);
+
+        let n = s.normal_at(Tuple::point(0., 2_f32.sqrt() / 2., - 2_f32.sqrt() / 2.));
+
+        assert_abs_diff_eq!(n, Tuple::vector(0., 0.97014, - 0.24254), epsilon = 0.00001);
     }
 }
