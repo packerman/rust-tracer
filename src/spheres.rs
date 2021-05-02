@@ -1,3 +1,5 @@
+use crate::tuples::Vector;
+use crate::tuples::Point;
 use crate::intersections::Intersection;
 use crate::tuples::Tuple;
 use crate::rays::Ray;
@@ -48,6 +50,10 @@ impl Sphere {
                 Intersection::new(t2, &self)]
         }
     }
+
+    pub fn normal_at(&self, p: Point) -> Vector {
+        (p - Tuple::point(0., 0., 0.)).normalize()
+    }
 }
 
 #[cfg(test)]
@@ -56,6 +62,7 @@ mod tests {
     use crate::tuples::Tuple;
     use super::*;
     use std::ptr;
+    use approx::assert_abs_diff_eq;
 
     #[test]
     fn ray_intersects_sphere_at_two_point() {
@@ -155,5 +162,50 @@ mod tests {
         let xs = s.intersect(&r);
 
         assert_eq!(xs.len(), 0);
+    }
+
+    #[test]
+    fn the_normal_on_a_sphere_at_a_point_on_the_x_axis() {
+        let s = Sphere::new();
+
+        let n = s.normal_at(Tuple::point(1., 0., 0.));
+
+        assert_eq!(n, Tuple::vector(1., 0., 0.));
+    }
+
+    #[test]
+    fn the_normal_on_a_sphere_at_a_point_on_the_y_axis() {
+        let s = Sphere::new();
+
+        let n = s.normal_at(Tuple::point(0., 1., 0.));
+
+        assert_eq!(n, Tuple::vector(0., 1., 0.));
+    }
+
+    #[test]
+    fn the_normal_on_a_sphere_at_a_point_on_the_z_axis() {
+        let s = Sphere::new();
+
+        let n = s.normal_at(Tuple::point(0., 0., 1.));
+
+        assert_eq!(n, Tuple::vector(0., 0., 1.));
+    }
+
+    #[test]
+    fn the_normal_on_a_sphere_at_a_nonaxial_point() {
+        let s = Sphere::new();
+
+        let n = s.normal_at(Tuple::point(3_f32.sqrt() / 3., 3_f32.sqrt() / 3., 3_f32.sqrt() / 3.));
+
+        assert_abs_diff_eq!(n, Tuple::vector(3_f32.sqrt() / 3., 3_f32.sqrt() / 3., 3_f32.sqrt() / 3.));
+    }
+
+    #[test]
+    fn the_normal_is_a_normalized_vector() {
+        let s = Sphere::new();
+
+        let n = s.normal_at(Tuple::point(3_f32.sqrt() / 3., 3_f32.sqrt() / 3., 3_f32.sqrt() / 3.));
+
+        assert_abs_diff_eq!(n, n.normalize());
     }
 }
