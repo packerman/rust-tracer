@@ -76,6 +76,10 @@ impl Tuple {
                         self.x*other.y - self.y*other.x)
     }
 
+    pub fn reflect(&self, normal: &Tuple) -> Tuple {
+        *self - *normal * 2. * self.dot(normal)
+    }
+
     pub fn color(x: f32, y: f32, z: f32) -> Color {
         Tuple::new(x, y, z, 0.0)
     }
@@ -367,5 +371,25 @@ mod tests {
         let c1 = Tuple::color(1.0, 0.2, 0.4);
         let c2 = Tuple::color(0.9, 1.0, 0.1);
         assert_abs_diff_eq!(c1 * c2, Tuple::color(0.9, 0.2, 0.04));
+    }
+
+    #[test]
+    fn reflecting_a_vector_approaching_at_45_deg() {
+        let v = Tuple::vector(1., -1., 0.);
+        let n = Tuple::vector(0., 1., 0.);
+
+        let r = v.reflect(&n);
+
+        assert_eq!(r, Tuple::vector(1., 1., 0.));
+    }
+
+    #[test]
+    fn reflecting_a_vector_of_a_slanted_surface() {
+        let v = Tuple::vector(0., -1., 0.);
+        let n = Tuple::vector(2_f32.sqrt() / 2., 2_f32.sqrt() / 2., 0.);
+
+        let r = v.reflect(&n);
+
+        assert_abs_diff_eq!(r, Tuple::vector(1., 0., 0.));
     }
 }
