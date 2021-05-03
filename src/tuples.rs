@@ -15,17 +15,17 @@ pub type Color = Tuple;
 
 impl Tuple {
 
-    pub fn new(x: f32, y: f32, z: f32, w: f32) -> Tuple {
+    pub const fn new(x: f32, y: f32, z: f32, w: f32) -> Tuple {
         Tuple {
             x, y, z, w,
         }
     }
 
-    pub fn point(x: f32, y: f32, z: f32) -> Point {
+    pub const fn point(x: f32, y: f32, z: f32) -> Point {
         Tuple::new(x, y, z, 1.0)
     }
 
-    pub fn vector(x: f32, y: f32, z: f32) -> Vector {
+    pub const fn vector(x: f32, y: f32, z: f32) -> Vector {
         Tuple::new(x, y, z, 0.0)
     }
 
@@ -80,7 +80,7 @@ impl Tuple {
         *self - *normal * 2. * self.dot(normal)
     }
 
-    pub fn color(x: f32, y: f32, z: f32) -> Color {
+    pub const fn color(x: f32, y: f32, z: f32) -> Color {
         Tuple::new(x, y, z, 0.0)
     }
 
@@ -95,6 +95,8 @@ impl Tuple {
     pub fn blue(&self) -> f32 {
         self.z
     }
+
+    pub const BLACK: Color = Self::color(0., 0., 0.);
 }
 
 impl ops::Add<Tuple> for Tuple {
