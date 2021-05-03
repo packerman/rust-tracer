@@ -15,17 +15,17 @@ pub type Color = Tuple;
 
 impl Tuple {
 
-    pub fn new(x: f32, y: f32, z: f32, w: f32) -> Tuple {
+    pub const fn new(x: f32, y: f32, z: f32, w: f32) -> Tuple {
         Tuple {
             x, y, z, w,
         }
     }
 
-    pub fn point(x: f32, y: f32, z: f32) -> Point {
+    pub const fn point(x: f32, y: f32, z: f32) -> Point {
         Tuple::new(x, y, z, 1.0)
     }
 
-    pub fn vector(x: f32, y: f32, z: f32) -> Vector {
+    pub const fn vector(x: f32, y: f32, z: f32) -> Vector {
         Tuple::new(x, y, z, 0.0)
     }
 
@@ -43,6 +43,10 @@ impl Tuple {
 
     pub fn w(&self) -> f32 {
         self.w
+    }
+
+    pub fn set_w(&mut self, w: f32) {
+        self.w = w;
     }
 
     pub fn is_point(&self) -> bool {
@@ -72,7 +76,11 @@ impl Tuple {
                         self.x*other.y - self.y*other.x)
     }
 
-    pub fn color(x: f32, y: f32, z: f32) -> Color {
+    pub fn reflect(&self, normal: &Tuple) -> Tuple {
+        *self - *normal * 2. * self.dot(normal)
+    }
+
+    pub const fn color(x: f32, y: f32, z: f32) -> Color {
         Tuple::new(x, y, z, 0.0)
     }
 
@@ -87,6 +95,8 @@ impl Tuple {
     pub fn blue(&self) -> f32 {
         self.z
     }
+
+    pub const BLACK: Color = Self::color(0., 0., 0.);
 }
 
 impl ops::Add<Tuple> for Tuple {
@@ -363,5 +373,25 @@ mod tests {
         let c1 = Tuple::color(1.0, 0.2, 0.4);
         let c2 = Tuple::color(0.9, 1.0, 0.1);
         assert_abs_diff_eq!(c1 * c2, Tuple::color(0.9, 0.2, 0.04));
+    }
+
+    #[test]
+    fn reflecting_a_vector_approaching_at_45_deg() {
+        let v = Tuple::vector(1., -1., 0.);
+        let n = Tuple::vector(0., 1., 0.);
+
+        let r = v.reflect(&n);
+
+        assert_eq!(r, Tuple::vector(1., 1., 0.));
+    }
+
+    #[test]
+    fn reflecting_a_vector_of_a_slanted_surface() {
+        let v = Tuple::vector(0., -1., 0.);
+        let n = Tuple::vector(2_f32.sqrt() / 2., 2_f32.sqrt() / 2., 0.);
+
+        let r = v.reflect(&n);
+
+        assert_abs_diff_eq!(r, Tuple::vector(1., 0., 0.));
     }
 }
