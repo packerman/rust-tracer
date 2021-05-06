@@ -3,8 +3,8 @@ use crate::tuples::Vector;
 use crate::tuples::Point;
 
 pub struct Ray {
-    origin: Point,
-    direction: Vector,
+    pub origin: Point,
+    pub direction: Vector,
 }
 
 impl Ray {
@@ -14,14 +14,6 @@ impl Ray {
             origin,
             direction,
         }
-    }
-
-    pub fn origin(&self) -> Point {
-        self.origin
-    }
-
-    pub fn direction(&self) -> Point {
-        self.direction
     }
 
     pub fn position(&self, t: f32) -> Point {
@@ -47,8 +39,8 @@ mod tests {
 
         let r = Ray::new(origin, direction);
 
-        assert_eq!(r.origin(), origin);
-        assert_eq!(r.direction(), direction);
+        assert_eq!(r.origin, origin);
+        assert_eq!(r.direction, direction);
     }
 
     #[test]
@@ -68,8 +60,8 @@ mod tests {
 
         let r2 = r.transform(&m);
 
-        assert_eq!(r2.origin(), Tuple::point(4., 6., 8.));
-        assert_eq!(r2.direction(), Tuple::vector(0., 1., 0.));
+        assert_eq!(r2.origin, Tuple::point(4., 6., 8.));
+        assert_eq!(r2.direction, Tuple::vector(0., 1., 0.));
     }
 
     #[test]
@@ -79,7 +71,7 @@ mod tests {
 
         let r2 = r.transform(&m);
 
-        assert_eq!(r2.origin(), Tuple::point(2., 6., 12.));
-        assert_eq!(r2.direction(), Tuple::vector(0., 3., 0.));
+        assert_eq!(r2.origin, Tuple::point(2., 6., 12.));
+        assert_eq!(r2.direction, Tuple::vector(0., 3., 0.));
     }
 }

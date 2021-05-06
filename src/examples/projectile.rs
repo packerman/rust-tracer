@@ -38,9 +38,9 @@ fn main() {
     let mut c = Canvas::new(900, 550);
     let red = Tuple::color(1.0, 0.0, 0.0);
     loop {
-        c.write_pixel(p.position.x() as usize, 550 - 1 - p.position.y() as usize, red);
+        c.write_pixel(p.position.x as usize, 550 - 1 - p.position.y as usize, red);
         p = e.tick(&p);
-        if p.position.y() < 0.0 {
+        if p.position.y < 0.0 {
             break;
         }
     }

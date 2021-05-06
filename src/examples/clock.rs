@@ -17,7 +17,7 @@ fn main() {
     let white = Tuple::color(1., 1., 1.);
     let half = (size as f32) / 2.;
     for hour in &hours {
-        c.write_pixel((hour.x()*radius + half) as usize, (hour.z()*radius + half) as usize, white);
+        c.write_pixel((hour.x*radius + half) as usize, (hour.z*radius + half) as usize, white);
     }
 
     let ppm = c.to_ppm().unwrap();

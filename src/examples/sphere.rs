@@ -21,8 +21,8 @@ fn main() {
     let mut shape = Sphere::new();
 
     let mut material = Material::new();
-    material.set_color(Tuple::color(1., 0.2, 1.));
-    shape.set_material(material);
+    material.color = Tuple::color(1., 0.2, 1.);
+    shape.material = material;
 
     let light = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
 
@@ -35,10 +35,10 @@ fn main() {
             let xs = shape.intersect(&r);
 
             for hit in hit(&xs) {
-                let point = r.position(hit.t());
-                let normal = hit.object().normal_at(&point);
-                let eye = - r.direction();
-                let color = hit.object().material().lighting(&light, &point, &eye, &normal);
+                let point = r.position(hit.t);
+                let normal = hit.object.normal_at(&point);
+                let eye = - r.direction;
+                let color = hit.object.material.lighting(&light, &point, &eye, &normal);
                 canvas.write_pixel(x, y, color);
             }
         }

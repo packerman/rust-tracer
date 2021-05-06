@@ -3,8 +3,8 @@ use crate::spheres::Sphere;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Intersection<'a> {
-    t: f32,
-    object: &'a Sphere,
+    pub t: f32,
+    pub object: &'a Sphere,
 }
 
 impl PartialEq for Intersection<'_> {
@@ -18,14 +18,6 @@ impl Intersection<'_> {
 
     pub fn new(t: f32, object: &Sphere) -> Intersection {
         Intersection { t, object }
-    }
-
-    pub fn t(&self) -> f32 {
-        self.t
-    }
-
-    pub fn object(&self) -> &Sphere {
-        return self.object
     }
 }
 
@@ -42,7 +34,7 @@ pub fn intersections<'a>(instersections: &'a mut [Intersection<'a>]) -> &'a[Inte
 }
 
 pub fn hit<'a>(intersections: &'a [Intersection<'a>]) -> Option<&'a Intersection<'a>> {
-    intersections.iter().find(|i| i.t() > 0.)
+    intersections.iter().find(|i| i.t > 0.)
 }
 
 #[cfg(test)]
@@ -56,8 +48,8 @@ mod tests {
         let s = Sphere::new();
         let i = Intersection::new(3.5, &s);
 
-        assert_eq!(i.t(), 3.5);
-        assert!(ptr::eq(i.object(), &s));
+        assert_eq!(i.t, 3.5);
+        assert!(ptr::eq(i.object, &s));
     }
 
     #[test]
@@ -70,8 +62,8 @@ mod tests {
         let xs = intersections(&mut is);
 
         assert_eq!(xs.len(), 2);
-        assert_eq!(xs[0].t(), 1.);
-        assert_eq!(xs[1].t(), 2.);
+        assert_eq!(xs[0].t, 1.);
+        assert_eq!(xs[1].t, 2.);
     }
 
     #[test]

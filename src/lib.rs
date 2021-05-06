@@ -7,6 +7,7 @@ pub mod spheres;
 pub mod intersections;
 pub mod lights;
 pub mod materials;
+pub mod world;
 
 #[cfg(test)]
 mod tests {
