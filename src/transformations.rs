@@ -1,4 +1,6 @@
 
+use crate::tuples::Vector;
+use crate::tuples::Point;
 use crate::matrices::Matrix4;
 
 pub type Transformation = Matrix4;
@@ -45,6 +47,19 @@ impl Transformation {
             y_x, 1., y_z, 0.,
             z_x, z_y, 1., 0.,
             0., 0., 0., 1.)
+    }
+
+    pub fn view(from: &Point, to: &Point, up: &Vector) -> Transformation {
+        let forward = (*to - *from).normalize();
+        let left = forward.cross(&up.normalize());
+        let true_up = left.cross(&forward);
+
+        let orientation = Matrix4::new(left.x, left.y, left.z, 0.,
+                                        true_up.x, true_up.y, true_up.z, 0.,
+                                        - forward.x, - forward.y, - forward.z, 0.,
+                                        0., 0., 0., 1.);
+
+        orientation * Self::translation(- from.x, - from.y, - from.z)
     }
 }
 
@@ -220,5 +235,54 @@ mod tests {
         let t = c * b * a;
 
         assert_eq!(t * p, Tuple::point(15., 0., 7.));
+    }
+
+    #[test]
+    fn the_view_transformation_matrix_for_the_default_transformation() {
+        let from = Tuple::point(0., 0., 0.);
+        let to = Tuple::point(0., 0., -1.);
+        let up = Tuple::vector(0., 1., 0.);
+
+        let t = Transformation::view(&from, &to, & up);
+
+        assert_eq!(t, Transformation::IDENTITY);
+    }
+
+    #[test]
+    fn the_view_transformation_matrix_looking_in_positive_z_direction() {
+        let from = Tuple::point(0., 0., 0.);
+        let to = Tuple::point(0., 0., 1.);
+        let up = Tuple::vector(0., 1., 0.);
+
+        let t = Transformation::view(&from, &to, & up);
+
+        assert_eq!(t, Transformation::scaling(-1., 1., -1.));
+    }
+
+    #[test]
+    fn the_view_transformation_moves_the_world() {
+        let from = Tuple::point(0., 0., 8.);
+        let to = Tuple::point(0., 0., 0.);
+        let up = Tuple::vector(0., 1., 0.);
+
+        let t = Transformation::view(&from, &to, & up);
+
+        assert_eq!(t, Transformation::translation(0., 0., -8.));
+    }
+
+    #[test]
+    fn an_arbitrary_view_transformation() {
+        let from = Tuple::point(1., 3., 2.);
+        let to = Tuple::point(4., -2., 8.);
+        let up = Tuple::vector(1., 1., 0.);
+
+        let t = Transformation::view(&from, &to, & up);
+
+        assert_abs_diff_eq!(t, Matrix4::new(
+            - 0.50709, 0.50709, 0.67612, - 2.36643,
+            0.76772, 0.60609, 0.12122, - 2.82843,
+            - 0.35857, 0.59761, - 0.71714, 0.,
+            0., 0., 0., 1.
+        ), epsilon = 0.00001);
     }
 }
