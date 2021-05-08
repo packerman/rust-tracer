@@ -1,3 +1,6 @@
+use crate::rays::Ray;
+use crate::tuples::Vector;
+use crate::tuples::Point;
 use std::cmp::Ordering;
 use std::ptr;
 use crate::spheres::Sphere;
@@ -38,9 +41,34 @@ pub fn hit<'a>(intersections: &'a [Intersection<'a>]) -> Option<&'a Intersection
     intersections.iter().find(|i| i.t > 0.)
 }
 
+struct Computations<'a> {
+    t: f32,
+    object: &'a Sphere,
+    point: Point,
+    eyev: Vector,
+    normalv: Vector,
+}
+
+impl Computations<'_> {
+
+    fn prepare<'a>(intersection: &Intersection<'a>, ray: &Ray) -> Computations<'a> {
+        let point = ray.position(intersection.t);
+        let normalv = intersection.object.normal_at(&point);
+        Computations {
+            t: intersection.t,
+            object: intersection.object,
+            point,
+            eyev: - ray.direction,
+            normalv,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
+    use crate::rays::Ray;
+    use crate::tuples::Tuple;
     use super::*;
     use std::ptr;
 
@@ -114,5 +142,20 @@ mod tests {
         let i = hit(&xs).unwrap();
 
         assert_eq!(i, &i4);
+    }
+
+    #[test]
+    fn precomputing_the_state_of_an_intersection() {
+        let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
+        let shape = Sphere::new();
+        let i = Intersection::new(4., &shape);
+
+        let comps = Computations::prepare(&i, &r);
+
+        assert_eq!(comps.t, i.t);
+        assert_eq!(comps.object, i.object);
+        assert_eq!(comps.point, Tuple::point(0., 0., -1.));
+        assert_eq!(comps.eyev, Tuple::vector(0., 0., -1.));
+        assert_eq!(comps.normalv, Tuple::vector(0., 0., -1.));
     }
 }
