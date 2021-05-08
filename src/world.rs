@@ -12,17 +12,17 @@ use crate::spheres::Sphere;
 
 struct World {
     objects: Vec<Sphere>,
-    light: Option<PointLight>,
+    lights: Vec<PointLight>,
 }
 
 impl World {
 
     pub fn new() -> World {
-        World { objects: vec![], light: None }
+        World { objects: vec![], lights: vec![] }
     }
 
     pub fn with_objects_and_light<'a>(objects: Vec<Sphere>, light: PointLight) -> World {
-        World { objects, light: Some(light) }
+        World { objects, lights: vec![light] }
     }
 
     pub fn default() -> World {
@@ -54,7 +54,9 @@ impl World {
     }
 
     fn shade_hit(&self, comps: &Computations) -> Color {
-        comps.object.material.lighting(&self.light.as_ref().unwrap(), &comps.point, &comps.eyev, &comps.normalv)
+        self.lights.iter()
+            .map(|light| comps.object.material.lighting(light, &comps.point, &comps.eyev, &comps.normalv))
+            .sum()
     }
 }
 
@@ -71,7 +73,7 @@ mod tests {
         let w = World::new();
 
         assert!(w.objects.is_empty());
-        assert!(w.light.is_none());
+        assert!(w.lights.is_empty());
     }
 
     #[test]
@@ -89,7 +91,7 @@ mod tests {
 
         let w = World::default();
 
-        assert_eq!(w.light, Some(light));
+        assert_eq!(w.lights, vec![light]);
         assert!(w.contains(&s1));
         assert!(w.contains(&s2));
     }
@@ -124,7 +126,7 @@ mod tests {
     #[test]
     fn shading_an_intersection_from_an_inside() {
         let mut w = World::default();
-        w.light = Some(PointLight::new(Tuple::point(0., 0.25, 0.), Tuple::color(1., 1., 1.)));
+        w.lights[0] = PointLight::new(Tuple::point(0., 0.25, 0.), Tuple::color(1., 1., 1.));
         let r = Ray::new(Tuple::point(0., 0., 0.), Tuple::vector(0., 0., 1.));
         let shape = &w.objects[1];
         let i = Intersection::new(0.5, &shape);
