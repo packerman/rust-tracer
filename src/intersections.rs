@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::ptr;
 use crate::spheres::Sphere;
 
@@ -23,12 +24,12 @@ impl Intersection<'_> {
 
 impl PartialOrd for Intersection<'_> {
 
-    fn partial_cmp(&self, other: &Intersection) -> std::option::Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Intersection) -> Option<Ordering> {
         self.t.partial_cmp(&other.t)
      }
 }
 
-pub fn intersections<'a>(instersections: &'a mut [Intersection<'a>]) -> &'a[Intersection<'a>] {
+pub fn intersections<'a>(mut instersections: Vec<Intersection>) -> Vec<Intersection> {
     instersections.sort_by(|a, b| a.partial_cmp(b).unwrap());
     instersections
 }
@@ -58,8 +59,7 @@ mod tests {
         let i1 = Intersection::new(1., &s);
         let i2 = Intersection::new(2., &s);
 
-        let mut is = vec![i1, i2];
-        let xs = intersections(&mut is);
+        let xs = intersections(vec![i1, i2]);
 
         assert_eq!(xs.len(), 2);
         assert_eq!(xs[0].t, 1.);
@@ -71,8 +71,7 @@ mod tests {
         let s = Sphere::new();
         let i1 = Intersection::new(1., &s);
         let i2 = Intersection::new(2., &s);
-        let mut is = vec![i2, i1];
-        let xs = intersections(&mut is);
+        let xs = intersections(vec![i2, i1]);
 
         let i = hit(&xs).unwrap();
 
@@ -84,8 +83,7 @@ mod tests {
         let s = Sphere::new();
         let i1 = Intersection::new(-1., &s);
         let i2 = Intersection::new(1., &s);
-        let mut is = vec![i2, i1];
-        let xs = intersections(&mut is);
+        let xs = intersections(vec![i2, i1]);
 
         let i = hit(&xs).unwrap();
 
@@ -97,8 +95,7 @@ mod tests {
         let s = Sphere::new();
         let i1 = Intersection::new(-2., &s);
         let i2 = Intersection::new(-1., &s);
-        let mut is = vec![i2, i1];
-        let xs = intersections(&mut is);
+        let xs = intersections(vec![i2, i1]);
 
         let i = hit(&xs);
 
@@ -112,8 +109,7 @@ mod tests {
         let i2 = Intersection::new(7., &s);
         let i3 = Intersection::new(-3., &s);
         let i4 = Intersection::new(2., &s);
-        let mut is = vec![i1, i2, i3, i4];
-        let xs = intersections(&mut is);
+        let xs = intersections(vec![i1, i2, i3, i4]);
 
         let i = hit(&xs).unwrap();
 

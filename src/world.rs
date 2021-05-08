@@ -1,4 +1,7 @@
 
+use crate::intersections::intersections;
+use crate::intersections::Intersection;
+use crate::rays::Ray;
 use crate::transformations::Transformation;
 use crate::materials::Material;
 use crate::tuples::Tuple;
@@ -39,11 +42,20 @@ impl World {
     pub fn contains(&self, object: &Sphere) -> bool {
         self.objects.contains(object)
     }
+
+    pub fn intersect(&self, ray: &Ray) -> Vec<Intersection> {
+        let mut result = vec![];
+        for object in &self.objects {
+            result.extend(object.intersect(ray));
+        }
+        intersections(result)
+    }
 }
 
 #[cfg(test)]
 mod tests {
 
+    use crate::rays::Ray;
     use super::*;
 
     #[test]
@@ -54,6 +66,7 @@ mod tests {
         assert!(w.light.is_none());
     }
 
+    #[test]
     fn the_default_world() {
         let light = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
         let mut s1 = Sphere::new();
@@ -71,5 +84,19 @@ mod tests {
         assert_eq!(w.light, Some(light));
         assert!(w.contains(&s1));
         assert!(w.contains(&s2));
+    }
+
+    #[test]
+    fn intersect_a_world_with_a_ray() {
+        let w = World::default_world();
+        let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
+
+        let xs = w.intersect(&r);
+
+        assert_eq!(xs.len(), 4);
+        assert_eq!(xs[0].t, 4.);
+        assert_eq!(xs[1].t, 4.5);
+        assert_eq!(xs[2].t, 5.5);
+        assert_eq!(xs[3].t, 6.);
     }
 }
