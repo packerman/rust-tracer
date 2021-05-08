@@ -11,7 +11,7 @@ use crate::tuples::Tuple;
 use crate::lights::PointLight;
 use crate::spheres::Sphere;
 
-struct World {
+pub struct World {
     objects: Vec<Sphere>,
     lights: Vec<PointLight>,
 }
@@ -22,11 +22,11 @@ impl World {
         World { objects: vec![], lights: vec![] }
     }
 
-    fn with_objects_and_light<'a>(objects: Vec<Sphere>, light: PointLight) -> World {
+    pub fn with_objects_and_light<'a>(objects: Vec<Sphere>, light: PointLight) -> World {
         World { objects, lights: vec![light] }
     }
 
-    fn default() -> World {
+    pub fn default() -> World {
         let light = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
 
         let mut s1 = Sphere::new();
@@ -60,7 +60,7 @@ impl World {
             .sum()
     }
 
-    fn color_at(&self, ray: &Ray) -> Color {
+    pub fn color_at(&self, ray: &Ray) -> Color {
         let intersections = self.intersect(&ray);
         let hit = hit(&intersections);
         match hit {

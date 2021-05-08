@@ -8,6 +8,7 @@ pub mod intersections;
 pub mod lights;
 pub mod materials;
 pub mod world;
+pub mod camera;
 
 #[cfg(test)]
 mod tests {
