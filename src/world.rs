@@ -1,4 +1,6 @@
 
+use crate::tuples::Color;
+use crate::intersections::Computations;
 use crate::intersections::intersections;
 use crate::intersections::Intersection;
 use crate::rays::Ray;
@@ -23,7 +25,7 @@ impl World {
         World { objects, light: Some(light) }
     }
 
-    pub fn default_world() -> World {
+    pub fn default() -> World {
         let light = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
 
         let mut s1 = Sphere::new();
@@ -50,13 +52,19 @@ impl World {
         }
         intersections(result)
     }
+
+    fn shade_hit(&self, comps: &Computations) -> Color {
+        comps.object.material.lighting(&self.light.as_ref().unwrap(), &comps.point, &comps.eyev, &comps.normalv)
+    }
 }
 
 #[cfg(test)]
 mod tests {
 
+    use crate::intersections::Computations;
     use crate::rays::Ray;
     use super::*;
+    use approx::assert_abs_diff_eq;
 
     #[test]
     fn creating_a_world() {
@@ -79,7 +87,7 @@ mod tests {
         let mut s2 = Sphere::new();
         s2.set_transform(Transformation::scaling(0.5, 0.5, 0.5));
 
-        let w = World::default_world();
+        let w = World::default();
 
         assert_eq!(w.light, Some(light));
         assert!(w.contains(&s1));
@@ -88,7 +96,7 @@ mod tests {
 
     #[test]
     fn intersect_a_world_with_a_ray() {
-        let w = World::default_world();
+        let w = World::default();
         let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
 
         let xs = w.intersect(&r);
@@ -98,5 +106,32 @@ mod tests {
         assert_eq!(xs[1].t, 4.5);
         assert_eq!(xs[2].t, 5.5);
         assert_eq!(xs[3].t, 6.);
+    }
+
+    #[test]
+    fn shading_an_intersection() {
+        let w = World::default();
+        let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
+        let shape = &w.objects[0];
+        let i = Intersection::new(4., &shape);
+
+        let comps = Computations::prepare(&i, &r);
+        let c = w.shade_hit(&comps);
+
+        assert_abs_diff_eq!(c, Tuple::color(0.38066, 0.47583, 0.2855), epsilon = 0.00001);
+    }
+
+    #[test]
+    fn shading_an_intersection_from_an_inside() {
+        let mut w = World::default();
+        w.light = Some(PointLight::new(Tuple::point(0., 0.25, 0.), Tuple::color(1., 1., 1.)));
+        let r = Ray::new(Tuple::point(0., 0., 0.), Tuple::vector(0., 0., 1.));
+        let shape = &w.objects[1];
+        let i = Intersection::new(0.5, &shape);
+
+        let comps = Computations::prepare(&i, &r);
+        let c = w.shade_hit(&comps);
+
+        assert_abs_diff_eq!(c, Tuple::color(0.90498, 0.90498, 0.90498), epsilon = 0.00001);
     }
 }
