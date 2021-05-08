@@ -7,11 +7,11 @@ use crate::tuples::Tuple;
 
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Material {
-    color: Color,
-    ambient: f32,
-    diffuse: f32,
-    specular: f32,
-    shininess:f32,
+    pub color: Color,
+    pub ambient: f32,
+    pub diffuse: f32,
+    pub specular: f32,
+    pub shininess:f32,
 }
 
 impl Material {
@@ -26,37 +26,9 @@ impl Material {
         }
     }
 
-    fn color(&self) -> &Color {
-        &self.color
-    }
-
-    pub fn set_color(&mut self, color: Color) {
-        self.color = color;
-    }
-
-    pub fn ambient(&self) -> &f32 {
-        &self.ambient
-    }
-
-    pub fn set_ambient(&mut self, ambient: f32) {
-        self.ambient = ambient;
-    }
-
-    fn diffuse(&self) -> &f32 {
-        &self.diffuse
-    }
-
-    fn specular(&self) -> &f32 {
-        &self.specular
-    }
-
-    fn shininess(&self) -> &f32 {
-        &self.shininess
-    }
-
     pub fn lighting(&self, light: &PointLight, point: &Point, eyev: &Vector, normalv: &Vector) -> Color {
-        let effective_color = self.color * *light.intensity();
-        let lightv = (*light.position() - *point).normalize();
+        let effective_color = self.color * light.intensity;
+        let lightv = (light.position - *point).normalize();
         let ambient = effective_color * self.ambient;
         let light_dot_normal = lightv.dot(normalv);
 
@@ -73,7 +45,7 @@ impl Material {
                 specular = Color::BLACK;
             } else {
                 let factor = reflect_dot_eye.powf(self.shininess);
-                specular = *light.intensity() * self.specular * factor;
+                specular = light.intensity * self.specular * factor;
             }
         }
 
@@ -89,11 +61,11 @@ mod tests {
     #[test]
     fn default_material() {
         let m = Material::new();
-        assert_eq!(m.color(), &Tuple::color(1., 1., 1.));
-        assert_eq!(m.ambient(), &0.1);
-        assert_eq!(m.diffuse(), &0.9);
-        assert_eq!(m.specular(), &0.9);
-        assert_eq!(m.shininess(), &200.);
+        assert_eq!(m.color, Tuple::color(1., 1., 1.));
+        assert_eq!(m.ambient, 0.1);
+        assert_eq!(m.diffuse, 0.9);
+        assert_eq!(m.specular, 0.9);
+        assert_eq!(m.shininess, 200.);
     }
 
     mod lighting_tests {

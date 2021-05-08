@@ -1,6 +1,9 @@
+use std::path::Path;
+use std::fs::File;
 use crate::tuples::Tuple;
 use core::fmt::Error;
 use std::fmt::Write;
+use std::io::Write as IOWrite;
 
 use crate::tuples::Color;
 
@@ -101,6 +104,12 @@ impl Canvas {
         }
         let result = formatter.to_string()?;
         Ok(result)
+    }
+
+    pub fn save_to_file(&self, path: &Path) {
+        let ppm = self.to_ppm().unwrap();
+        let mut file = File::create(&path).unwrap();
+        file.write_all(ppm.as_bytes()).unwrap();
     }
 }
 

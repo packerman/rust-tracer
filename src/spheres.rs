@@ -6,11 +6,11 @@ use crate::tuples::Tuple;
 use crate::rays::Ray;
 use crate::transformations::Transformation;
 
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub struct Sphere {
     transform: Transformation,
     inversed_transform: Transformation,
-    material: Material,
+    pub material: Material,
 }
 
 impl Sphere {
@@ -32,21 +32,13 @@ impl Sphere {
         self.inversed_transform = transform.inverse();
     }
 
-    pub fn material(&self) -> &Material {
-        &self.material
-    }
-
-    pub fn set_material(&mut self, material: Material) {
-        self.material = material;
-    }
-
     pub fn intersect(&self, ray: &Ray) -> Vec<Intersection> {
         let ray2 = ray.transform(&self.inversed_transform);
 
-        let sphere_to_ray = ray2.origin() - Tuple::point(0., 0., 0.);
+        let sphere_to_ray = ray2.origin - Tuple::point(0., 0., 0.);
 
-        let a = ray2.direction().dot(&ray2.direction());
-        let b = 2. * ray2.direction().dot(&sphere_to_ray);
+        let a = ray2.direction.dot(&ray2.direction);
+        let b = 2. * ray2.direction.dot(&sphere_to_ray);
         let c = sphere_to_ray.dot(&sphere_to_ray) - 1.;
 
         let discriminant = b * b - 4. * a * c;
@@ -66,7 +58,7 @@ impl Sphere {
         let object_point = self.inversed_transform * *world_point;
         let object_normal = object_point - Tuple::point(0., 0., 0.);
         let mut world_normal = self.inversed_transform.transpose() * object_normal;
-        world_normal.set_w(0.);
+        world_normal.w =0.;
         world_normal.normalize()
     }
 }
@@ -86,8 +78,8 @@ mod tests {
         let s = Sphere::new();
         let xs = s.intersect(&r);
         assert_eq!(xs.len(), 2);
-        assert_eq!(xs[0].t(), 4.);
-        assert_eq!(xs[1].t(), 6.);
+        assert_eq!(xs[0].t, 4.);
+        assert_eq!(xs[1].t, 6.);
     }
 
     #[test]
@@ -96,8 +88,8 @@ mod tests {
         let s = Sphere::new();
         let xs = s.intersect(&r);
         assert_eq!(xs.len(), 2);
-        assert_eq!(xs[0].t(), 5.);
-        assert_eq!(xs[1].t(), 5.);
+        assert_eq!(xs[0].t, 5.);
+        assert_eq!(xs[1].t, 5.);
     }
 
     #[test]
@@ -114,8 +106,8 @@ mod tests {
         let s = Sphere::new();
         let xs = s.intersect(&r);
         assert_eq!(xs.len(), 2);
-        assert_eq!(xs[0].t(), -1.);
-        assert_eq!(xs[1].t(), 1.);
+        assert_eq!(xs[0].t, -1.);
+        assert_eq!(xs[1].t, 1.);
     }
 
     #[test]
@@ -124,8 +116,8 @@ mod tests {
         let s = Sphere::new();
         let xs = s.intersect(&r);
         assert_eq!(xs.len(), 2);
-        assert_eq!(xs[0].t(), -6.);
-        assert_eq!(xs[1].t(), -4.);
+        assert_eq!(xs[0].t, -6.);
+        assert_eq!(xs[1].t, -4.);
     }
 
     #[test]
@@ -136,8 +128,8 @@ mod tests {
         let xs = s.intersect(&r);
 
         assert_eq!(xs.len(), 2);
-        assert!(ptr::eq(xs[0].object(), &s));
-        assert!(ptr::eq(xs[1].object(), &s));
+        assert!(ptr::eq(xs[0].object, &s));
+        assert!(ptr::eq(xs[1].object, &s));
     }
 
     #[test]
@@ -165,8 +157,8 @@ mod tests {
         let xs = s.intersect(&r);
 
         assert_eq!(xs.len(), 2);
-        assert_eq!(xs[0].t(), 3.);
-        assert_eq!(xs[1].t(), 7.);
+        assert_eq!(xs[0].t, 3.);
+        assert_eq!(xs[1].t, 7.);
     }
 
     #[test]
@@ -250,19 +242,19 @@ mod tests {
     fn a_sphere_has_a_default_material() {
         let s = Sphere::new();
 
-        let m = s.material();
+        let m = s.material;
 
-        assert_eq!(m, &Material::new());
+        assert_eq!(m, Material::new());
     }
 
     #[test]
     fn a_sphere_may_be_assigned_a_material() {
         let mut s = Sphere::new();
         let mut m = Material::new();
-        m.set_ambient(1.);
+        m.ambient = 1.;
 
-        s.set_material(m);
+        s.material =m;
 
-        assert_eq!(s.material(), &m);
+        assert_eq!(s.material, m);
     }
 }

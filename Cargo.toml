@@ -28,3 +28,7 @@ path = "src/examples/silhouette.rs"
 [[bin]]
 name = "sphere"
 path = "src/examples/sphere.rs"
+
+[[bin]]
+name = "scene"
+path = "src/examples/scene.rs"

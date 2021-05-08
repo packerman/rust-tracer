@@ -1,12 +1,14 @@
+use std::iter::Sum;
+use std::ops::AddAssign;
 use approx::AbsDiffEq;
 use std::ops;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {
-    x: f32,
-    y: f32,
-    z: f32,
-    w: f32,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+    pub w: f32,
 }
 
 pub type Point = Tuple;
@@ -27,26 +29,6 @@ impl Tuple {
 
     pub const fn vector(x: f32, y: f32, z: f32) -> Vector {
         Tuple::new(x, y, z, 0.0)
-    }
-
-    pub fn x(&self) -> f32 {
-        self.x
-    }
-
-    pub fn y(&self) -> f32 {
-        self.y
-    }
-
-    pub fn z(&self) -> f32 {
-        self.z
-    }
-
-    pub fn w(&self) -> f32 {
-        self.w
-    }
-
-    pub fn set_w(&mut self, w: f32) {
-        self.w = w;
     }
 
     pub fn is_point(&self) -> bool {
@@ -166,6 +148,29 @@ impl AbsDiffEq for Tuple {
         self.y.abs_diff_eq(&other.y, epsilon) &&
         self.z.abs_diff_eq(&other.z, epsilon) &&
         self.w.abs_diff_eq(&other.w, epsilon)
+     }
+}
+
+impl AddAssign for Tuple {
+
+    fn add_assign(&mut self, other: Self) {
+        *self = Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+            w: self.w + other.w,
+        };
+     }
+}
+
+impl Sum for Tuple {
+
+    fn sum<I : Iterator<Item = Tuple>>(iter: I) -> Self {
+        let mut result = Tuple::new(0., 0., 0., 0.);
+        for tuple in iter {
+            result += tuple;
+        }
+        result
      }
 }
 

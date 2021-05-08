@@ -1,23 +1,16 @@
 use crate::tuples::Point;
 use crate::tuples::Color;
 
+#[derive(PartialEq, Debug)]
 pub struct PointLight {
-    intensity: Color,
-    position: Point,
+    pub intensity: Color,
+    pub position: Point,
 }
 
 impl PointLight {
 
     pub fn new(position: Point, intensity: Color) -> PointLight {
         PointLight { position, intensity }
-    }
-
-    pub fn position(&self) -> &Point {
-        &self.position
-    }
-
-    pub fn intensity(&self) -> &Color {
-        &self.intensity
     }
 }
 
@@ -34,7 +27,7 @@ mod tests {
 
         let light = PointLight::new(position, intensity);
 
-        assert_eq!(light.position(), &position);
-        assert_eq!(light.intensity(), &intensity)
+        assert_eq!(light.position, position);
+        assert_eq!(light.intensity, intensity)
     }
 }
