@@ -51,7 +51,7 @@ pub struct Computations<'a> {
     pub over_point: Point,
 }
 
-const EPSILON: f32 = f32::EPSILON;
+const EPSILON: f32 = 0.001;
 
 impl Computations<'_> {
 
