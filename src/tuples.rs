@@ -39,7 +39,7 @@ impl Tuple {
         self.w == 0.0
     }
 
-    fn magnitude(&self) -> f32 {
+    pub fn magnitude(&self) -> f32 {
         (self.x*self.x + self.y*self.y + self.z*self.z + self.w*self.w).sqrt()
     }
 
