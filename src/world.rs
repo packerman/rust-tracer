@@ -57,7 +57,10 @@ impl World {
 
     fn shade_hit(&self, comps: &Computations) -> Color {
         self.lights.iter()
-            .map(|light| comps.object.material.lighting(light, &comps.point, &comps.eyev, &comps.normalv, false))
+            .map(|light| {
+                let shadowed = self.is_shadowed(&comps.over_point, light);
+                comps.object.material.lighting(light, &comps.over_point, &comps.eyev, &comps.normalv, shadowed)
+            })
             .sum()
     }
 
@@ -230,19 +233,19 @@ mod tests {
         assert!(!w.is_shadowed(&p, &w.lights[0]));
     }
 
-    // #[test]
-    // fn shade_hit_is_given_an_intersection_in_shadow() {
-    //     let light = PointLight::new(Tuple::point(0., 0., -10.), Tuple::color(1., 1., 1.));
-    //     let s1 = Sphere::new();
-    //     let mut s2 = Sphere::new();
-    //     s2.set_transform(Transformation::translation(0., 0., 10.));
-    //     let i = Intersection::new(4., &s2);
-    //     let w = World::with_objects_and_light(vec![s1, s2], light);
-    //     let r = Ray::new(Tuple::point(0., 0., 5.), Tuple::vector(0., 0., 1.));
+    #[test]
+    fn shade_hit_is_given_an_intersection_in_shadow() {
+        let light = PointLight::new(Tuple::point(0., 0., -10.), Tuple::color(1., 1., 1.));
+        let s1 = Sphere::new();
+        let mut s2 = Sphere::new();
+        s2.set_transform(Transformation::translation(0., 0., 10.));
+        let w = World::with_objects_and_light(vec![s1, s2], light);
+        let r = Ray::new(Tuple::point(0., 0., 5.), Tuple::vector(0., 0., 1.));
+        let i = Intersection::new(4., &w.objects[1]);
 
-    //     let comps = Computations::prepare(&i, &r);
-    //     let c = w.shade_hit(&comps);
+        let comps = Computations::prepare(&i, &r);
+        let c = w.shade_hit(&comps);
 
-    //     assert_eq!(c, Tuple::color(0.1, 0.1, 0.1));
-    // }
+        assert_eq!(c, Tuple::color(0.1, 0.1, 0.1));
+    }
 }

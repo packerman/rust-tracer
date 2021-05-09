@@ -48,7 +48,10 @@ pub struct Computations<'a> {
     pub eyev: Vector,
     pub normalv: Vector,
     inside: bool,
+    pub over_point: Point,
 }
+
+const EPSILON: f32 = f32::EPSILON;
 
 impl Computations<'_> {
 
@@ -70,6 +73,7 @@ impl Computations<'_> {
             eyev,
             normalv,
             inside,
+            over_point: point + normalv * EPSILON,
         }
     }
 }
@@ -77,6 +81,7 @@ impl Computations<'_> {
 #[cfg(test)]
 mod tests {
 
+    use crate::transformations::Transformation;
     use crate::rays::Ray;
     use crate::tuples::Tuple;
     use super::*;
@@ -192,5 +197,18 @@ mod tests {
         assert_eq!(comps.eyev, Tuple::vector(0., 0., -1.));
         assert!(comps.inside);
         assert_eq!(comps.normalv, Tuple::vector(0., 0., -1.));
+    }
+
+    #[test]
+    fn the_shit_should_offset_the_point() {
+        let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
+        let mut shape = Sphere::new();
+        shape.set_transform(Transformation::translation(0., 0., 1.));
+        let i = Intersection::new(5., &shape);
+
+        let comps = Computations::prepare(&i, &r);
+
+        assert!(comps.over_point.z < - EPSILON / 2.);
+        assert!(comps.point.z > comps.over_point.z);
     }
 }
