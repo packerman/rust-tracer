@@ -1,3 +1,4 @@
+use crate::tuples::Scalar;
 use crate::rays::Ray;
 use crate::tuples::Vector;
 use crate::tuples::Point;
@@ -7,7 +8,7 @@ use crate::spheres::Sphere;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Intersection<'a> {
-    pub t: f32,
+    pub t: Scalar,
     pub object: &'a Sphere,
 }
 
@@ -20,7 +21,7 @@ impl PartialEq for Intersection<'_> {
 
 impl Intersection<'_> {
 
-    pub fn new(t: f32, object: &Sphere) -> Intersection {
+    pub fn new(t: Scalar, object: &Sphere) -> Intersection {
         Intersection { t, object }
     }
 }
@@ -42,7 +43,7 @@ pub fn hit<'a>(intersections: &'a [Intersection<'a>]) -> Option<&'a Intersection
 }
 
 pub struct Computations<'a> {
-    t: f32,
+    t: Scalar,
     pub object: &'a Sphere,
     pub point: Point,
     pub eyev: Vector,
@@ -51,7 +52,7 @@ pub struct Computations<'a> {
     pub over_point: Point,
 }
 
-const EPSILON: f32 = 0.00001;
+const EPSILON: Scalar = 0.00001;
 
 impl Computations<'_> {
 

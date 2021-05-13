@@ -1,10 +1,8 @@
 use std::path::Path;
 use lib::camera::Camera;
-use std::f32::consts::FRAC_PI_3;
+use std::f64::consts::*;
 use lib::world::World;
 use lib::lights::PointLight;
-use std::f32::consts::FRAC_PI_2;
-use std::f32::consts::FRAC_PI_4;
 use lib::tuples::Tuple;
 use lib::materials::Material;
 use lib::transformations::Transformation;

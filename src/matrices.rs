@@ -1,18 +1,19 @@
 
+use crate::tuples::Scalar;
 use approx::AbsDiffEq;
 use crate::tuples::Tuple;
 use std::ops::Mul;
 use std::ops::Index;
 
 #[derive(PartialEq, Debug, Copy, Clone)]
-pub struct Matrix4([[f32;4];4]);
+pub struct Matrix4([[Scalar;4];4]);
 
 impl Matrix4 {
 
-    pub const fn new(m00: f32, m01: f32, m02: f32, m03: f32,
-        m10: f32, m11: f32, m12: f32, m13: f32,
-        m20: f32, m21: f32, m22: f32, m23: f32,
-        m30: f32, m31: f32, m32: f32, m33: f32) -> Matrix4 {
+    pub const fn new(m00: Scalar, m01: Scalar, m02: Scalar, m03: Scalar,
+        m10: Scalar, m11: Scalar, m12: Scalar, m13: Scalar,
+        m20: Scalar, m21: Scalar, m22: Scalar, m23: Scalar,
+        m30: Scalar, m31: Scalar, m32: Scalar, m33: Scalar) -> Matrix4 {
             Matrix4 {
                 0: [[m00, m01, m02, m03], [m10, m11, m12, m13], [m20, m21, m22, m23], [m30, m31, m32, m33]],
             }
@@ -43,15 +44,15 @@ impl Matrix4 {
         Matrix3 { 0 : result }
     }
 
-    fn minor(&self, l: usize, k: usize) -> f32 {
+    fn minor(&self, l: usize, k: usize) -> Scalar {
         self.sub_matrix(l, k).determinant()
     }
 
-    fn cofactor(&self, l: usize, k: usize) -> f32 {
+    fn cofactor(&self, l: usize, k: usize) -> Scalar {
         (if (l + k) % 2 == 0 { 1.0 } else { -1.0 }) * self.minor(l, k)
     }
 
-    fn determinant(&self) -> f32 {
+    fn determinant(&self) -> Scalar {
         self.0[0][0] * self.cofactor(0, 0) +
         self.0[0][1] * self.cofactor(0, 1) +
         self.0[0][2] * self.cofactor(0, 2) +
@@ -76,7 +77,7 @@ impl Matrix4 {
 
 impl Index<(usize, usize)> for Matrix4 {
 
-    type Output = f32;
+    type Output = Scalar;
 
     fn index(&self, index: (usize, usize)) -> &Self::Output {
         &self.0[index.0][index.1]
@@ -117,10 +118,10 @@ impl Mul<Tuple> for Matrix4 {
 
 impl AbsDiffEq for Matrix4 {
 
-    type Epsilon = f32;
+    type Epsilon = Scalar;
 
     fn default_epsilon() -> Self::Epsilon {
-        f32::default_epsilon()
+        Self::Epsilon::default_epsilon()
     }
 
     fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
@@ -136,24 +137,24 @@ impl AbsDiffEq for Matrix4 {
 }
 
 #[derive(PartialEq, Debug)]
-pub struct Matrix2([[f32;2];2]);
+pub struct Matrix2([[Scalar;2];2]);
 
 impl Matrix2 {
 
-    pub fn new(m00: f32, m01: f32, m10: f32, m11: f32) -> Matrix2 {
+    pub fn new(m00: Scalar, m01: Scalar, m10: Scalar, m11: Scalar) -> Matrix2 {
         Matrix2 {
             0: [[m00, m01], [m10, m11]],
         }
     }
 
-    pub fn determinant(&self) -> f32 {
+    pub fn determinant(&self) -> Scalar {
         self.0[0][0] * self.0[1][1] - self.0[0][1] * self.0[1][0]
     }
 }
 
 impl Index<(usize, usize)> for Matrix2 {
 
-    type Output = f32;
+    type Output = Scalar;
 
     fn index(&self, index: (usize, usize)) -> &Self::Output {
         &self.0[index.0][index.1]
@@ -161,13 +162,13 @@ impl Index<(usize, usize)> for Matrix2 {
 }
 
 #[derive(PartialEq, Debug)]
-pub struct Matrix3([[f32;3];3]);
+pub struct Matrix3([[Scalar;3];3]);
 
 impl Matrix3 {
 
-    pub fn new(m00: f32, m01: f32, m02: f32,
-        m10: f32, m11: f32, m12: f32,
-        m20: f32, m21: f32, m22: f32) -> Matrix3 {
+    pub fn new(m00: Scalar, m01: Scalar, m02: Scalar,
+        m10: Scalar, m11: Scalar, m12: Scalar,
+        m20: Scalar, m21: Scalar, m22: Scalar) -> Matrix3 {
             Matrix3 {
                 0: [[m00, m01, m02], [m10, m11, m12], [m20, m21, m22]],
             }
@@ -183,22 +184,22 @@ impl Matrix3 {
         Matrix2 { 0 : result }
     }
 
-    fn minor(&self, l: usize, k: usize) -> f32 {
+    fn minor(&self, l: usize, k: usize) -> Scalar {
         self.sub_matrix(l, k).determinant()
     }
 
-    fn cofactor(&self, l: usize, k: usize) -> f32 {
+    fn cofactor(&self, l: usize, k: usize) -> Scalar {
         (if (l + k) % 2 == 0 { 1.0 } else { -1.0 }) * self.minor(l, k)
     }
 
-    pub fn determinant(&self) -> f32 {
+    pub fn determinant(&self) -> Scalar {
         self.0[0][0] * self.cofactor(0, 0) + self.0[0][1] * self.cofactor(0, 1) + self.0[0][2] * self.cofactor(0, 2)
     }
 }
 
 impl Index<(usize, usize)> for Matrix3 {
 
-    type Output = f32;
+    type Output = Scalar;
 
     fn index(&self, index: (usize, usize)) -> &Self::Output {
         &self.0[index.0][index.1]

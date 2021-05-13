@@ -1,7 +1,6 @@
 use std::path::Path;
 use lib::world::World;
-use std::f32::consts::PI;
-use std::f32::consts::FRAC_PI_4;
+use std::f64::consts::*;
 use lib::spheres::Sphere;
 use lib::materials::Material;
 use lib::lights::PointLight;

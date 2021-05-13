@@ -1,4 +1,5 @@
 
+use crate::tuples::Scalar;
 use crate::tuples::Vector;
 use crate::tuples::Point;
 use crate::matrices::Matrix4;
@@ -7,42 +8,42 @@ pub type Transformation = Matrix4;
 
 impl Transformation {
 
-    pub fn translation(x: f32, y: f32, z: f32) -> Transformation {
+    pub fn translation(x: Scalar, y: Scalar, z: Scalar) -> Transformation {
         Matrix4::new(1., 0., 0., x,
                     0., 1., 0., y,
                     0., 0., 1., z,
                     0., 0., 0., 1.)
     }
 
-    pub fn scaling(x: f32, y: f32, z: f32) -> Transformation {
+    pub fn scaling(x: Scalar, y: Scalar, z: Scalar) -> Transformation {
         Matrix4::new(x, 0., 0., 0.,
                     0., y, 0., 0.,
                     0., 0., z, 0.,
                     0., 0., 0., 1.)
     }
 
-    pub fn rotation_x(r: f32) -> Transformation {
+    pub fn rotation_x(r: Scalar) -> Transformation {
         Matrix4::new(1., 0., 0., 0.,
                         0., r.cos(), - r.sin(), 0.,
                         0., r.sin(), r.cos(), 0.,
                         0., 0., 0., 1.)
     }
 
-    pub fn rotation_y(r: f32) -> Transformation {
+    pub fn rotation_y(r: Scalar) -> Transformation {
         Matrix4::new(r.cos(), 0., r.sin(), 0.,
                         0., 1., 0., 0.,
                         - r.sin(), 0., r.cos(), 0.,
                         0., 0., 0., 1.)
     }
 
-    pub fn rotation_z(r: f32) -> Transformation {
+    pub fn rotation_z(r: Scalar) -> Transformation {
         Matrix4::new(r.cos(), - r.sin(), 0., 0.,
                         r.sin(), r.cos(), 0., 0.,
                         0., 0., 1., 0.,
                         0., 0., 0., 1.)
     }
 
-    pub fn shearing(x_y: f32, x_z: f32, y_x: f32, y_z: f32, z_x: f32, z_y: f32) -> Transformation {
+    pub fn shearing(x_y: Scalar, x_z: Scalar, y_x: Scalar, y_z: Scalar, z_x: Scalar, z_y: Scalar) -> Transformation {
         Matrix4::new(1., x_y, x_z, 0.,
             y_x, 1., y_z, 0.,
             z_x, z_y, 1., 0.,
@@ -66,7 +67,7 @@ impl Transformation {
 #[cfg(test)]
 mod tests {
 
-    use std::f32::consts::*;
+    use std::f64::consts::*;
     use crate::tuples::Tuple;
     use super::*;
     use approx::assert_abs_diff_eq;
