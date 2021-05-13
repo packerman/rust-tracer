@@ -1,4 +1,5 @@
 
+use crate::tuples::Scalar;
 use crate::tuples::Vector;
 use crate::tuples::Point;
 use crate::lights::PointLight;
@@ -8,10 +9,10 @@ use crate::tuples::Tuple;
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Material {
     pub color: Color,
-    pub ambient: f32,
-    pub diffuse: f32,
-    pub specular: f32,
-    pub shininess:f32,
+    pub ambient: Scalar,
+    pub diffuse: Scalar,
+    pub specular: Scalar,
+    pub shininess: Scalar,
 }
 
 impl Material {
@@ -70,6 +71,7 @@ mod tests {
 
     mod lighting_tests {
 
+        use std::f64::consts::*;
         use super::*;
         use approx::assert_abs_diff_eq;
         use crate::tuples::Point;
@@ -91,7 +93,7 @@ mod tests {
 
         #[test]
         fn ligthing_with_the_eye_between_light_and_surface_eye_offset_45_deg() {
-            let eyev = Tuple::vector(0., 2_f32.sqrt() / 2., - 2_f32.sqrt() / 2.);
+            let eyev = Tuple::vector(0., SQRT_2 / 2., - SQRT_2 / 2.);
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 0., -10.), Tuple::color(1., 1., 1.));
 
@@ -111,7 +113,7 @@ mod tests {
 
         #[test]
         fn ligthing_with_the_eye_in_the_path_of_the_reflection_vector() {
-            let eyev = Tuple::vector(0., - 2_f32.sqrt() / 2., - 2_f32.sqrt() / 2.);
+            let eyev = Tuple::vector(0., - SQRT_2 / 2., - SQRT_2 / 2.);
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 10., -10.), Tuple::color(1., 1., 1.));
 

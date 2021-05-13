@@ -1,3 +1,4 @@
+use crate::tuples::Scalar;
 use std::path::Path;
 use std::fs::File;
 use crate::tuples::Tuple;
@@ -82,7 +83,7 @@ impl Canvas {
         self.pixels[y][x] = c;
     }
 
-    fn f32_to_u8(value: f32) -> u8 {
+    fn scalar_to_u8(value: Scalar) -> u8 {
         (value * 255.0).round() as u8
     }
 
@@ -96,9 +97,9 @@ impl Canvas {
         formatter.new_line()?;
         for row in &self.pixels {
             for pixel in row {
-                formatter.write(format!("{}", Self::f32_to_u8(pixel.red())))?;
-                formatter.write(format!("{}", Self::f32_to_u8(pixel.green())))?;
-                formatter.write(format!("{}", Self::f32_to_u8(pixel.blue())))?;
+                formatter.write(format!("{}", Self::scalar_to_u8(pixel.red())))?;
+                formatter.write(format!("{}", Self::scalar_to_u8(pixel.green())))?;
+                formatter.write(format!("{}", Self::scalar_to_u8(pixel.blue())))?;
             }
             formatter.new_line()?;
         }

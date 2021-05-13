@@ -3,12 +3,14 @@ use std::ops::AddAssign;
 use approx::AbsDiffEq;
 use std::ops;
 
+pub type Scalar = f64;
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-    pub w: f32,
+    pub x: Scalar,
+    pub y: Scalar,
+    pub z: Scalar,
+    pub w: Scalar,
 }
 
 pub type Point = Tuple;
@@ -17,17 +19,17 @@ pub type Color = Tuple;
 
 impl Tuple {
 
-    pub const fn new(x: f32, y: f32, z: f32, w: f32) -> Tuple {
+    pub const fn new(x: Scalar, y: Scalar, z: Scalar, w: Scalar) -> Tuple {
         Tuple {
             x, y, z, w,
         }
     }
 
-    pub const fn point(x: f32, y: f32, z: f32) -> Point {
+    pub const fn point(x: Scalar, y: Scalar, z: Scalar) -> Point {
         Tuple::new(x, y, z, 1.0)
     }
 
-    pub const fn vector(x: f32, y: f32, z: f32) -> Vector {
+    pub const fn vector(x: Scalar, y: Scalar, z: Scalar) -> Vector {
         Tuple::new(x, y, z, 0.0)
     }
 
@@ -39,7 +41,7 @@ impl Tuple {
         self.w == 0.0
     }
 
-    pub fn magnitude(&self) -> f32 {
+    pub fn magnitude(&self) -> Scalar {
         (self.x*self.x + self.y*self.y + self.z*self.z + self.w*self.w).sqrt()
     }
 
@@ -48,7 +50,7 @@ impl Tuple {
         Tuple::new(self.x / m, self.y / m, self.z / m, self.w / m)
     }
 
-    pub fn dot(&self, other: &Tuple) -> f32 {
+    pub fn dot(&self, other: &Tuple) -> Scalar {
         self.x*other.x + self.y*other.y + self.z*other.z + self.w*other.w
     }
 
@@ -62,19 +64,19 @@ impl Tuple {
         *self - *normal * 2. * self.dot(normal)
     }
 
-    pub const fn color(x: f32, y: f32, z: f32) -> Color {
+    pub const fn color(x: Scalar, y: Scalar, z: Scalar) -> Color {
         Tuple::new(x, y, z, 0.0)
     }
 
-    pub fn red(&self) -> f32 {
+    pub fn red(&self) -> Scalar {
         self.x
     }
 
-    pub fn green(&self) -> f32 {
+    pub fn green(&self) -> Scalar {
         self.y
     }
 
-    pub fn blue(&self) -> f32 {
+    pub fn blue(&self) -> Scalar {
         self.z
     }
 
@@ -108,11 +110,11 @@ impl ops::Neg for Tuple {
      }
 }
 
-impl ops::Mul<f32> for Tuple {
+impl ops::Mul<Scalar> for Tuple {
 
     type Output = Self;
 
-    fn mul(self, factor: f32) -> Self {
+    fn mul(self, factor: Scalar) -> Self {
         Tuple::new(self.x * factor, self.y * factor, self.z * factor, self.w * factor)
      }
 }
@@ -126,21 +128,21 @@ impl ops::Mul<Tuple> for Tuple {
      }
 }
 
-impl ops::Div<f32> for Tuple {
+impl ops::Div<Scalar> for Tuple {
 
     type Output = Self;
 
-    fn div(self, factor: f32) -> Self {
+    fn div(self, factor: Scalar) -> Self {
         Tuple::new(self.x / factor, self.y / factor, self.z / factor, self.w / factor)
      }
 }
 
 impl AbsDiffEq for Tuple {
 
-    type Epsilon = f32;
+    type Epsilon = Scalar;
 
     fn default_epsilon() -> Self::Epsilon {
-        f32::default_epsilon()
+        Self::Epsilon::default_epsilon()
      }
 
     fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
@@ -177,6 +179,7 @@ impl Sum for Tuple {
 #[cfg(test)]
 mod tests {
 
+    use std::f64::consts::*;
     use super::*;
     use approx::assert_abs_diff_eq;
 
@@ -302,13 +305,13 @@ mod tests {
     #[test]
     fn computing_magnitude_of_vector_4() {
         let v = Tuple::vector(1.0, 2.0, 3.0);
-        assert_eq!(v.magnitude(), 14.0_f32.sqrt());
+        assert_eq!(v.magnitude(), 14_f64.sqrt());
     }
 
     #[test]
     fn computing_magnitude_of_vector_5() {
         let v = Tuple::vector(-1.0, -2.0, -3.0);
-        assert_eq!(v.magnitude(), 14.0_f32.sqrt());
+        assert_eq!(v.magnitude(), 14_f64.sqrt());
     }
 
     #[test]
@@ -393,7 +396,7 @@ mod tests {
     #[test]
     fn reflecting_a_vector_of_a_slanted_surface() {
         let v = Tuple::vector(0., -1., 0.);
-        let n = Tuple::vector(2_f32.sqrt() / 2., 2_f32.sqrt() / 2., 0.);
+        let n = Tuple::vector(SQRT_2 / 2., SQRT_2 / 2., 0.);
 
         let r = v.reflect(&n);
 

@@ -1,3 +1,4 @@
+use crate::tuples::Scalar;
 use crate::transformations::Transformation;
 use crate::tuples::Vector;
 use crate::tuples::Point;
@@ -16,7 +17,7 @@ impl Ray {
         }
     }
 
-    pub fn position(&self, t: f32) -> Point {
+    pub fn position(&self, t: Scalar) -> Point {
         self.origin + self.direction * t
     }
 

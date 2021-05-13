@@ -66,7 +66,7 @@ impl Sphere {
 #[cfg(test)]
 mod tests {
 
-    use std::f32::consts::PI;
+    use std::f64::consts::*;
     use crate::tuples::Tuple;
     use super::*;
     use std::ptr;
@@ -203,16 +203,16 @@ mod tests {
     fn the_normal_on_a_sphere_at_a_nonaxial_point() {
         let s = Sphere::new();
 
-        let n = s.normal_at(&Tuple::point(3_f32.sqrt() / 3., 3_f32.sqrt() / 3., 3_f32.sqrt() / 3.));
+        let n = s.normal_at(&Tuple::point(3_f64.sqrt() / 3., 3_f64.sqrt() / 3., 3_f64.sqrt() / 3.));
 
-        assert_abs_diff_eq!(n, Tuple::vector(3_f32.sqrt() / 3., 3_f32.sqrt() / 3., 3_f32.sqrt() / 3.));
+        assert_abs_diff_eq!(n, Tuple::vector(3_f64.sqrt() / 3., 3_f64.sqrt() / 3., 3_f64.sqrt() / 3.));
     }
 
     #[test]
     fn the_normal_is_a_normalized_vector() {
         let s = Sphere::new();
 
-        let n = s.normal_at(&Tuple::point(3_f32.sqrt() / 3., 3_f32.sqrt() / 3., 3_f32.sqrt() / 3.));
+        let n = s.normal_at(&Tuple::point(3_f64.sqrt() / 3., 3_f64.sqrt() / 3., 3_f64.sqrt() / 3.));
 
         assert_abs_diff_eq!(n, n.normalize());
     }
@@ -233,7 +233,7 @@ mod tests {
         let m = Transformation::scaling(1., 0.5, 1.) * Transformation::rotation_z(PI / 5.);
         s.set_transform(m);
 
-        let n = s.normal_at(&Tuple::point(0., 2_f32.sqrt() / 2., - 2_f32.sqrt() / 2.));
+        let n = s.normal_at(&Tuple::point(0., SQRT_2 / 2., - SQRT_2 / 2.));
 
         assert_abs_diff_eq!(n, Tuple::vector(0., 0.97014, - 0.24254), epsilon = 0.00001);
     }

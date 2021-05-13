@@ -1,4 +1,5 @@
 
+use crate::tuples::Scalar;
 use crate::canvas::Canvas;
 use crate::world::World;
 use crate::tuples::Tuple;
@@ -8,22 +9,22 @@ use crate::transformations::Transformation;
 pub struct Camera {
     hsize: usize,
     vsize: usize,
-    field_of_view: f32,
+    field_of_view: Scalar,
     transform: Transformation,
     inversed_transform: Transformation,
-    pixel_size: f32,
-    half_width: f32,
-    half_height: f32,
+    pixel_size: Scalar,
+    half_width: Scalar,
+    half_height: Scalar,
 }
 
 impl Camera {
 
-    pub fn new(hsize: usize, vsize: usize, field_of_view: f32) -> Camera {
+    pub fn new(hsize: usize, vsize: usize, field_of_view: Scalar) -> Camera {
         let half_view = (field_of_view / 2.).tan();
-        let aspect = (hsize as f32) / (vsize as f32);
+        let aspect = (hsize as Scalar) / (vsize as Scalar);
 
-        let half_width: f32;
-        let half_height: f32;
+        let half_width: Scalar;
+        let half_height: Scalar;
         if aspect >= 1. {
             half_width = half_view;
             half_height = half_view / aspect;
@@ -38,7 +39,7 @@ impl Camera {
             field_of_view,
             transform: Transformation::IDENTITY,
             inversed_transform: Transformation::IDENTITY,
-            pixel_size: (half_width * 2.) / (hsize as f32),
+            pixel_size: (half_width * 2.) / (hsize as Scalar),
             half_width,
             half_height,
         }
@@ -54,8 +55,8 @@ impl Camera {
     }
 
     fn ray_for_pixel(&self, px: usize, py: usize) -> Ray {
-        let xoffset = (px as f32 + 0.5) * self.pixel_size;
-        let yoffset = (py as f32 + 0.5) * self.pixel_size;
+        let xoffset = (px as Scalar + 0.5) * self.pixel_size;
+        let yoffset = (py as Scalar + 0.5) * self.pixel_size;
 
         let world_x = self.half_width - xoffset;
         let world_y = self.half_height - yoffset;
@@ -85,11 +86,9 @@ impl Camera {
 #[cfg(test)]
 mod tests {
 
-    use std::f32::consts::SQRT_2;
-    use std::f32::consts::FRAC_PI_4;
+    use std::f64::consts::*;
     use crate::tuples::Tuple;
     use super::*;
-    use std::f32::consts::FRAC_PI_2;
     use approx::assert_abs_diff_eq;
 
     #[test]
@@ -110,14 +109,14 @@ mod tests {
     fn the_pixel_size_for_a_horizontal_canvas() {
         let c = Camera::new(200, 125, FRAC_PI_2);
 
-        assert_eq!(c.pixel_size, 0.01);
+        assert_abs_diff_eq!(c.pixel_size, 0.01);
     }
 
     #[test]
     fn the_pixel_size_for_a_vertical_canvas() {
         let c = Camera::new(125, 200, FRAC_PI_2);
 
-        assert_eq!(c.pixel_size, 0.01);
+        assert_abs_diff_eq!(c.pixel_size, 0.01);
     }
 
     #[test]
