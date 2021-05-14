@@ -8,5 +8,5 @@
    cargo run --bin sphere
    ```
    where `sphere` can be substituted with another example's name. See
-[examples](https://github.com/krzema12/rust-tracer/tree/main/src/examples) directory.
+[examples](src/examples) directory.
 1. The output is written to a PPM file, so in this case open `sphere.ppm`.
