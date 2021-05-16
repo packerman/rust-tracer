@@ -50,7 +50,8 @@ fn main() {
 
     let light_source = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
 
-    let world = World::with_objects_and_light(vec![floor, left_wall, right_wall, middle, right, left], light_source);
+    let world = World::with_objects_and_light(vec![Box::new(floor), Box::new(left_wall), Box::new(right_wall),
+                                                    Box::new(middle), Box::new(right), Box::new(left)], light_source);
 
     let mut camera = Camera::new(100, 50, FRAC_PI_3);
     camera.set_transform(Transformation::view(&Tuple::point(0., 1.5, -5.),

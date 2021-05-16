@@ -89,7 +89,9 @@ fn main() {
                         Transformation::translation(1., 0., 0.) *
                         Transformation::scaling(2.5, 0.6, 0.6));
 
-    let world = World::with_objects_and_light(vec![backdrop, wrist, palm, thumb, index, middle, ring, pinky], light);
+    let world = World::with_objects_and_light(vec![Box::new(backdrop), Box::new(wrist), Box::new(palm), Box::new(thumb),
+                                                    Box::new(index), Box::new(middle), Box::new(ring), Box::new(pinky)],
+                                                    light);
 
     let canvas = camera.render(&world);
     canvas.save_to_file(Path::new("shadows.ppm"));

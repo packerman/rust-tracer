@@ -1,32 +1,33 @@
+use crate::shapes::normal_at;
+use crate::shapes::Shape;
 use crate::tuples::Scalar;
 use crate::rays::Ray;
 use crate::tuples::Vector;
 use crate::tuples::Point;
 use std::cmp::Ordering;
 use std::ptr;
-use crate::spheres::Sphere;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Intersection<'a> {
     pub t: Scalar,
-    pub object: &'a Sphere,
+    pub object: &'a dyn Shape,
 }
 
-impl PartialEq for Intersection<'_> {
+impl<'a> PartialEq for Intersection<'a> {
 
-    fn eq(&self, other: &Intersection<'_>) -> bool {
+    fn eq(&self, other: &Intersection) -> bool {
         self.t == other.t && ptr::eq(self.object, other.object)
     }
 }
 
-impl Intersection<'_> {
+impl<'a> Intersection<'a> {
 
-    pub fn new(t: Scalar, object: &Sphere) -> Intersection {
+    pub fn new(t: Scalar, object: &'a dyn Shape) -> Intersection<'a> {
         Intersection { t, object }
     }
 }
 
-impl PartialOrd for Intersection<'_> {
+impl<'a> PartialOrd for Intersection<'a> {
 
     fn partial_cmp(&self, other: &Intersection) -> Option<Ordering> {
         self.t.partial_cmp(&other.t)
@@ -38,13 +39,13 @@ pub fn intersections<'a>(mut instersections: Vec<Intersection>) -> Vec<Intersect
     instersections
 }
 
-pub fn hit<'a>(intersections: &'a [Intersection<'a>]) -> Option<&'a Intersection<'a>> {
+pub fn hit<'a>(intersections: &'a [Intersection]) -> Option<&'a Intersection<'a>> {
     intersections.iter().find(|i| i.t > 0.)
 }
 
 pub struct Computations<'a> {
     t: Scalar,
-    pub object: &'a Sphere,
+    pub object: &'a dyn Shape,
     pub point: Point,
     pub eyev: Vector,
     pub normalv: Vector,
@@ -54,11 +55,12 @@ pub struct Computations<'a> {
 
 const EPSILON: Scalar = 0.00001;
 
-impl Computations<'_> {
+impl<'a> Computations<'a> {
 
-    pub fn prepare<'a>(intersection: &Intersection<'a>, ray: &Ray) -> Computations<'a> {
+    pub fn prepare(intersection: &Intersection<'a>, ray: &Ray) -> Computations<'a> {
         let point = ray.position(intersection.t);
-        let mut normalv = intersection.object.normal_at(&point);
+        // let mut normalv = intersection.object.normal_at(&point);
+        let mut normalv = normal_at(intersection.object, &point);
         let eyev = - ray.direction;
         let inside: bool;
         if normalv.dot(&eyev) < 0. {
@@ -82,6 +84,7 @@ impl Computations<'_> {
 #[cfg(test)]
 mod tests {
 
+    use crate::spheres::Sphere;
     use crate::transformations::Transformation;
     use crate::rays::Ray;
     use crate::tuples::Tuple;
@@ -94,7 +97,7 @@ mod tests {
         let i = Intersection::new(3.5, &s);
 
         assert_eq!(i.t, 3.5);
-        assert!(ptr::eq(i.object, &s));
+        assert!(ptr::eq(i.object, &s as &dyn Shape));
     }
 
     #[test]
@@ -169,7 +172,7 @@ mod tests {
         let comps = Computations::prepare(&i, &r);
 
         assert_eq!(comps.t, i.t);
-        assert_eq!(comps.object, i.object);
+        assert!(ptr::eq(comps.object, i.object));
         assert_eq!(comps.point, Tuple::point(0., 0., -1.));
         assert_eq!(comps.eyev, Tuple::vector(0., 0., -1.));
         assert_eq!(comps.normalv, Tuple::vector(0., 0., -1.));
