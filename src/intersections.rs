@@ -39,7 +39,7 @@ pub fn intersections<'a>(mut instersections: Vec<Intersection>) -> Vec<Intersect
     instersections
 }
 
-pub fn hit<'a>(intersections: &'a [Intersection]) -> Option<&'a Intersection<'a>> {
+pub fn hit<'a>(intersections: &'a Vec<Intersection<'a>>) -> Option<&'a Intersection<'a>> {
     intersections.iter().find(|i| i.t > 0.)
 }
 
@@ -57,10 +57,10 @@ const EPSILON: Scalar = 0.00001;
 
 impl<'a> Computations<'a> {
 
-    pub fn prepare(intersection: &Intersection<'a>, ray: &Ray) -> Computations<'a> {
+    pub fn prepare(intersection: &'a Intersection<'a>, ray: &Ray) -> Computations<'a> {
         let point = ray.position(intersection.t);
-        // let mut normalv = intersection.object.normal_at(&point);
-        let mut normalv = normal_at(intersection.object, &point);
+        let object = intersection.object;
+        let mut normalv = normal_at(object, &point);
         let eyev = - ray.direction;
         let inside: bool;
         if normalv.dot(&eyev) < 0. {
@@ -71,7 +71,7 @@ impl<'a> Computations<'a> {
         }
         Computations {
             t: intersection.t,
-            object: intersection.object,
+            object,
             point,
             eyev,
             normalv,

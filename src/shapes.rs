@@ -25,21 +25,19 @@ pub trait Shape: Debug {
 impl dyn Shape {
 
     pub fn intersect(&self, ray: &Ray) -> Vec<Intersection> {
-        let local_ray = ray.transform(&self.inversed_transform());
-        self.local_intersect(&local_ray)
+        intersect(self, ray)
     }
 
     pub fn normal_at(&self, point: &Point) -> Vector {
-        let local_point = *self.inversed_transform() * *point;
-        let local_normal = self.local_normal_at(&local_point);
-        let mut world_normal = self.inversed_transform().transpose() * local_normal;
-        world_normal.w = 0.;
-
-        world_normal.normalize()
+        normal_at(self, point)
     }
 }
 
-// TODO remove
+pub fn intersect<'a>(shape: &'a dyn Shape, ray: &Ray) -> Vec<Intersection<'a>> {
+    let local_ray = ray.transform(shape.inversed_transform());
+    shape.local_intersect(&local_ray)
+}
+
 pub fn normal_at(shape: &dyn Shape, point: &Point) -> Vector {
     let local_point = *shape.inversed_transform() * *point;
     let local_normal = shape.local_normal_at(&local_point);

@@ -50,7 +50,7 @@ impl World {
 
     fn intersect(&self, ray: &Ray) -> Vec<Intersection> {
         let mut result = vec![];
-        for object in self.objects.iter() {
+        for object in &self.objects {
             result.extend(object.intersect(ray));
         }
         intersections(result)
