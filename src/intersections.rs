@@ -12,28 +12,28 @@ pub struct Intersection<'a> {
     pub object: &'a dyn Shape,
 }
 
-impl<'a> PartialEq for Intersection<'a> {
+impl PartialEq for Intersection<'_> {
 
     fn eq(&self, other: &Intersection) -> bool {
         self.t == other.t && ptr::eq(self.object, other.object)
     }
 }
 
-impl<'a> Intersection<'a> {
+impl Intersection<'_> {
 
-    pub fn new(t: Scalar, object: &'a dyn Shape) -> Intersection<'a> {
+    pub fn new(t: Scalar, object: &dyn Shape) -> Intersection {
         Intersection { t, object }
     }
 }
 
-impl<'a> PartialOrd for Intersection<'a> {
+impl PartialOrd for Intersection<'_> {
 
     fn partial_cmp(&self, other: &Intersection) -> Option<Ordering> {
         self.t.partial_cmp(&other.t)
      }
 }
 
-pub fn intersections<'a>(mut instersections: Vec<Intersection>) -> Vec<Intersection> {
+pub fn intersections(mut instersections: Vec<Intersection>) -> Vec<Intersection> {
     instersections.sort_by(|a, b| a.partial_cmp(b).unwrap());
     instersections
 }
@@ -54,9 +54,9 @@ pub struct Computations<'a> {
 
 const EPSILON: Scalar = 0.00001;
 
-impl<'a> Computations<'a> {
+impl <'a> Computations<'a> {
 
-    pub fn prepare(intersection: &'a Intersection<'a>, ray: &Ray) -> Computations<'a> {
+    pub fn prepare(intersection: &Intersection<'a>, ray: &Ray) -> Computations<'a> {
         let point = ray.position(intersection.t);
         let object = intersection.object;
         let mut normalv = object.normal_at(&point);
