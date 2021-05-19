@@ -1,4 +1,3 @@
-use crate::shapes::normal_at;
 use crate::shapes::Shape;
 use crate::tuples::Scalar;
 use crate::rays::Ray;
@@ -60,7 +59,7 @@ impl<'a> Computations<'a> {
     pub fn prepare(intersection: &'a Intersection<'a>, ray: &Ray) -> Computations<'a> {
         let point = ray.position(intersection.t);
         let object = intersection.object;
-        let mut normalv = normal_at(object, &point);
+        let mut normalv = object.normal_at(&point);
         let eyev = - ray.direction;
         let inside: bool;
         if normalv.dot(&eyev) < 0. {

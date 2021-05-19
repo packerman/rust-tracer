@@ -1,4 +1,4 @@
-use lib::shapes::intersect;
+use lib::shapes::Shape;
 use lib::tuples::Scalar;
 use lib::lights::PointLight;
 use lib::materials::Material;
@@ -34,7 +34,7 @@ fn main() {
             let world_x = - half + pixel_size * (x as Scalar);
             let position = Tuple::point(world_x, world_y, wall_z);
             let r = Ray::new(ray_origin, (position - ray_origin).normalize());
-            let xs = intersect(&sphere, &r);
+            let xs = (&sphere as &dyn Shape).intersect(&r);
 
             for hit in hit(&xs) {
                 let point = r.position(hit.t);
