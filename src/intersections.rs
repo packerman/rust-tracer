@@ -206,7 +206,7 @@ mod tests {
     fn the_shit_should_offset_the_point() {
         let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
         let mut shape = Sphere::new();
-        shape.set_transform(Transformation::translation(0., 0., 1.));
+        (&mut shape as &mut dyn Shape).set_transform(Transformation::translation(0., 0., 1.));
         let i = Intersection::new(5., &shape);
 
         let comps = Computations::prepare(&i, &r);

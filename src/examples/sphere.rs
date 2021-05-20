@@ -24,7 +24,7 @@ fn main() {
 
     let mut material = Material::new();
     material.color = Tuple::color(1., 0.2, 1.);
-    sphere.material = material;
+    (&mut sphere as &mut dyn Shape).set_material(material);
 
     let light = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
 

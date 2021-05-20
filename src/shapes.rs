@@ -7,15 +7,42 @@ use crate::rays::Ray;
 use crate::materials::Material;
 use crate::transformations::Transformation;
 
+#[derive(Debug)]
+pub struct BaseShape {
+    transform: Transformation,
+    inverted_transform: Transformation,
+    pub material: Material,
+}
+
+impl BaseShape {
+
+    pub fn new() -> BaseShape {
+        BaseShape {
+            transform: Transformation::IDENTITY,
+            inverted_transform: Transformation::IDENTITY,
+            material: Material::new(),
+        }
+    }
+
+    pub fn transform(&self) -> &Transformation {
+        &self.transform
+    }
+
+    pub fn inversed_transform(&self) -> &Transformation {
+        &self.inverted_transform
+    }
+
+    pub fn set_transform(&mut self, transform: Transformation) {
+        self.transform = transform;
+        self.inverted_transform = transform.inverse();
+    }
+}
+
 pub trait Shape: Debug {
 
-    fn transform(&self) -> &Transformation;
+    fn base(&self) -> &BaseShape;
 
-    fn inversed_transform(&self) -> &Transformation;
-
-    fn material(&self) -> &Material;
-
-    fn set_material(&mut self, material: Material);
+    fn base_mut(&mut self) -> &mut BaseShape;
 
     fn local_intersect(&self, ray: &Ray) -> Vec<Intersection>;
 
@@ -23,6 +50,26 @@ pub trait Shape: Debug {
 }
 
 impl<'a> dyn Shape + 'a {
+
+    pub fn transform(&self) -> &Transformation {
+        self.base().transform()
+    }
+
+    pub fn inversed_transform(&self) -> &Transformation {
+        self.base().inversed_transform()
+    }
+
+    pub fn set_transform(&mut self, transform: Transformation) {
+        self.base_mut().set_transform(transform);
+    }
+
+    pub fn material(&self) -> &Material {
+        &self.base().material
+    }
+
+    pub fn set_material(&mut self, material: Material) {
+        self.base_mut().material = material;
+    }
 
     pub fn intersect(&self, ray: &Ray) -> Vec<Intersection> {
         let local_ray = ray.transform(self.inversed_transform());
@@ -48,43 +95,26 @@ mod tests {
     use approx::assert_abs_diff_eq;
 
     #[derive(Debug)]
-    struct TestShape {
-        transform: Transformation,
-        inversed_transform: Transformation,
-        material: Material,
-    }
+    struct TestShape(BaseShape);
 
     impl TestShape {
 
         fn new() -> TestShape {
             TestShape {
-                transform: Transformation::IDENTITY,
-                inversed_transform: Transformation::IDENTITY,
-                material: Material::new(),
+                0: BaseShape::new()
             }
-        }
-
-        fn set_transform(&mut self, transform: Transformation) {
-            self.transform = transform;
-            self.inversed_transform = transform.inverse();
         }
     }
 
     impl Shape for TestShape {
 
-        fn transform(&self) -> &Transformation {
-            &self.transform
+        fn base(&self) -> &BaseShape {
+            &self.0
         }
 
-        fn inversed_transform(&self) -> &Transformation {
-            &self.inversed_transform
+        fn base_mut(&mut self) -> &mut BaseShape {
+            &mut self.0
         }
-
-        fn material(&self) -> &Material {
-            &self.material
-        }
-
-        fn set_material(&mut self, material: Material) { todo!() }
 
         fn local_intersect(&self, ray: &Ray) -> Vec<Intersection> {
             vec![Intersection::new(1., self)]
@@ -103,23 +133,23 @@ mod tests {
         fn the_default_transform() {
             let s = TestShape::new();
 
-            assert_eq!(s.transform(), &Transformation::IDENTITY);
+            assert_eq!((&s as &dyn Shape).transform(), &Transformation::IDENTITY);
         }
 
         #[test]
         fn assigning_a_transformation() {
             let mut s = TestShape::new();
 
-            s.set_transform(Transformation::translation(2., 3., 4.));
+            (&mut s as &mut dyn Shape).set_transform(Transformation::translation(2., 3., 4.));
 
-            assert_eq!(s.transform(), &Transformation::translation(2., 3., 4.));
+            assert_eq!((&s as &dyn Shape).transform(), &Transformation::translation(2., 3., 4.));
         }
 
         #[test]
         fn the_default_material() {
             let s = TestShape::new();
 
-            assert_eq!(s.material(), &Material::new());
+            assert_eq!((&s as &dyn Shape).material(), &Material::new());
         }
 
         #[test]
@@ -128,9 +158,9 @@ mod tests {
             let mut m = Material::new();
             m.ambient = 1.;
 
-            s.material = m;
+            (&mut s as &mut dyn Shape).set_material(m);
 
-            assert_eq!(s.material(), &m);
+            assert_eq!((&s as &dyn Shape).material(), &m);
         }
     }
 
@@ -139,7 +169,7 @@ mod tests {
         let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
         let mut s = TestShape::new();
 
-        s.set_transform(Transformation::scaling(2., 2., 2.));
+        (&mut s as &mut dyn Shape).set_transform(Transformation::scaling(2., 2., 2.));
         let xs = (&s as &dyn Shape).intersect(&r);
 
         assert_eq!(xs.len(), 1);
@@ -151,7 +181,7 @@ mod tests {
         let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
         let mut s = TestShape::new();
 
-        s.set_transform(Transformation::translation(5., 0., 0.));
+        (&mut s as &mut dyn Shape).set_transform(Transformation::translation(5., 0., 0.));
         let xs = (&s as &dyn Shape).intersect(&r);
 
         assert_eq!(xs.len(), 1);
@@ -161,7 +191,7 @@ mod tests {
     #[test]
     fn computing_normal_on_a_translated_sphere() {
         let mut s = TestShape::new();
-        s.set_transform(Transformation::translation(0., 1., 0.));
+        (&mut s as &mut dyn Shape).set_transform(Transformation::translation(0., 1., 0.));
 
         let n = (&s as &dyn Shape).normal_at(&Tuple::point(0., 1.70711, - 0.70711));
 
@@ -172,7 +202,7 @@ mod tests {
     fn computing_normal_on_a_transformed_sphere() {
         let mut s = TestShape::new();
         let m = Transformation::scaling(1., 0.5, 1.) * Transformation::rotation_z(PI / 5.);
-        s.set_transform(m);
+        (&mut s as &mut dyn Shape).set_transform(m);
 
         let n = (&s as &dyn Shape).normal_at(&Tuple::point(0., SQRT_2 / 2., - SQRT_2 / 2.));
 

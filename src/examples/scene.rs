@@ -1,3 +1,4 @@
+use lib::shapes::Shape;
 use std::path::Path;
 use lib::camera::Camera;
 use std::f64::consts::*;
@@ -9,49 +10,48 @@ use lib::transformations::Transformation;
 use lib::spheres::Sphere;
 
 fn main() {
-    let mut floor = Sphere::new();
+    let mut floor: Box<dyn Shape> = Box::new(Sphere::new());
     floor.set_transform(Transformation::scaling(10., 0.01, 10.));
-    floor.material = Material::new();
-    floor.material.color = Tuple::color(1., 0.9, 0.9);
-    floor.material.specular = 0.;
+    floor.set_material(Material::new());
+    floor.base_mut().material.color = Tuple::color(1., 0.9, 0.9);
+    floor.base_mut().material.specular = 0.;
 
-    let mut left_wall = Sphere::new();
+    let mut left_wall: Box<dyn Shape> = Box::new(Sphere::new());
     left_wall.set_transform(Transformation::translation(0., 0., 5.) *
                             Transformation::rotation_y(- FRAC_PI_4) * Transformation::rotation_x(FRAC_PI_2) *
                             Transformation::scaling(10., 0.01, 10.));
-    left_wall.material = floor.material;
+    left_wall.set_material(*floor.material());
 
-    let mut right_wall = Sphere::new();
+    let mut right_wall: Box<dyn Shape> = Box::new(Sphere::new());
     right_wall.set_transform(Transformation::translation(0., 0., 5.) *
                             Transformation::rotation_y(FRAC_PI_4) * Transformation::rotation_x(FRAC_PI_2) *
                             Transformation::scaling(10., 0.01, 10.));
-    right_wall.material = floor.material;
+    right_wall.set_material(*floor.material());
 
-    let mut middle = Sphere::new();
+    let mut middle: Box<dyn Shape> = Box::new(Sphere::new());
     middle.set_transform(Transformation::translation(-0.5, 1., 0.5));
-    middle.material = Material::new();
-    middle.material.color = Tuple::color(0.1, 1., 0.5);
-    middle.material.diffuse = 0.7;
-    middle.material.specular = 0.3;
+    middle.set_material(Material::new());
+    middle.base_mut().material.color = Tuple::color(0.1, 1., 0.5);
+    middle.base_mut().material.diffuse = 0.7;
+    middle.base_mut().material.specular = 0.3;
 
-    let mut right = Sphere::new();
+    let mut right: Box<dyn Shape> = Box::new(Sphere::new());
     right.set_transform(Transformation::translation(1.5, 0.5, - 0.5) * Transformation::scaling(0.5, 0.5, 0.5));
-    right.material = Material::new();
-    right.material.color = Tuple::color(0.5, 1., 0.1);
-    right.material.diffuse = 0.7;
-    right.material.specular = 0.3;
+    right.set_material(Material::new());
+    right.base_mut().material.color = Tuple::color(0.5, 1., 0.1);
+    right.base_mut().material.diffuse = 0.7;
+    right.base_mut().material.specular = 0.3;
 
-    let mut left = Sphere::new();
+    let mut left: Box<dyn Shape> = Box::new(Sphere::new());
     left.set_transform(Transformation::translation(- 1.5, 0.33, - 0.75) * Transformation::scaling(0.33, 0.33, 0.33));
-    left.material = Material::new();
-    left.material.color = Tuple::color(1., 0.8, 0.1);
-    left.material.diffuse = 0.7;
-    left.material.specular = 0.3;
+    left.set_material(Material::new());
+    left.base_mut().material.color = Tuple::color(1., 0.8, 0.1);
+    left.base_mut().material.diffuse = 0.7;
+    left.base_mut().material.specular = 0.3;
 
     let light_source = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
 
-    let world = World::with_objects_and_light(vec![Box::new(floor), Box::new(left_wall), Box::new(right_wall),
-                                                    Box::new(middle), Box::new(right), Box::new(left)], light_source);
+    let world = World::with_objects_and_light(vec![floor, left_wall, right_wall, middle, right, left], light_source);
 
     let mut camera = Camera::new(100, 50, FRAC_PI_3);
     camera.set_transform(Transformation::view(&Tuple::point(0., 1.5, -5.),

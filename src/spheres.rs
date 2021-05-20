@@ -1,51 +1,31 @@
+use crate::shapes::BaseShape;
 use crate::shapes::Shape;
-use crate::materials::Material;
 use crate::tuples::Vector;
 use crate::tuples::Point;
 use crate::intersections::Intersection;
 use crate::tuples::Tuple;
 use crate::rays::Ray;
-use crate::transformations::Transformation;
 
-#[derive(PartialEq, Debug)]
-pub struct Sphere {
-    transform: Transformation,
-    inversed_transform: Transformation,
-    pub material: Material,
-}
+#[derive(Debug)]
+pub struct Sphere(BaseShape);
 
 impl Sphere {
 
     pub fn new() -> Sphere {
         Sphere {
-            transform: Transformation::IDENTITY,
-            inversed_transform: Transformation::IDENTITY,
-            material: Material::new(),
+            0: BaseShape::new()
         }
-    }
-
-    pub fn set_transform(&mut self, transform: Transformation) {
-        self.transform = transform;
-        self.inversed_transform = transform.inverse();
     }
 }
 
 impl Shape for Sphere {
 
-    fn transform(&self) -> &Transformation {
-        &self.transform
+    fn base(&self) -> &BaseShape {
+        &self.0
     }
 
-    fn inversed_transform(&self) -> &Transformation {
-        &self.inversed_transform
-    }
-
-    fn material(&self) -> &Material {
-        &self.material
-    }
-
-    fn set_material(&mut self, material: Material) {
-        self.material = material;
+    fn base_mut(&mut self) -> &mut BaseShape {
+        &mut self.0
     }
 
     fn local_intersect(&self, ray: &Ray) -> Vec<Intersection> {
@@ -76,6 +56,8 @@ impl Shape for Sphere {
 #[cfg(test)]
 mod tests {
 
+    use crate::materials::Material;
+    use crate::transformations::Transformation;
     use crate::tuples::Tuple;
     use super::*;
     use approx::assert_abs_diff_eq;
@@ -145,7 +127,7 @@ mod tests {
     fn a_sphere_default_transformation() {
         let s = Sphere::new();
 
-        assert_eq!(s.transform(), &Transformation::IDENTITY);
+        assert_eq!((&s as &dyn Shape).transform(), &Transformation::IDENTITY);
     }
 
     #[test]
@@ -153,8 +135,8 @@ mod tests {
         let mut s = Sphere::new();
         let t = Transformation::translation(2., 3., 4.);
 
-        s.set_transform(t);
-        assert_eq!(s.transform(), &t);
+        (&mut s as &mut dyn Shape).set_transform(t);
+        assert_eq!((&s as &dyn Shape).transform(), &t);
     }
 
     #[test]
@@ -206,9 +188,9 @@ mod tests {
     fn a_sphere_has_a_default_material() {
         let s = Sphere::new();
 
-        let m = s.material;
+        let m = (&s as &dyn Shape).material();
 
-        assert_eq!(m, Material::new());
+        assert_eq!(m, &Material::new());
     }
 
     #[test]
@@ -217,8 +199,8 @@ mod tests {
         let mut m = Material::new();
         m.ambient = 1.;
 
-        s.material =m;
+        (&mut s as &mut dyn Shape).set_material(m);
 
-        assert_eq!(s.material, m);
+        assert_eq!((&s as &dyn Shape).material(), &m);
     }
 }
