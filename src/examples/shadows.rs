@@ -93,5 +93,5 @@ fn main() {
     let world = World::with_objects_and_light(vec![backdrop, wrist, palm, thumb, index, middle, ring, pinky], light);
 
     let canvas = camera.render(&world);
-    canvas.save_to_file(Path::new("shadows.ppm"));
+    canvas.save_to_file(Path::new("shadows.ppm")).unwrap();
 }

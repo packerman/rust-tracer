@@ -1,12 +1,15 @@
+use std::io::BufWriter;
 use crate::tuples::Scalar;
 use std::path::Path;
 use std::fs::File;
 use crate::tuples::Tuple;
-use core::fmt::Error;
 use std::fmt::Write;
 use std::io::Write as IOWrite;
-
+use std::ffi::OsStr;
 use crate::tuples::Color;
+use std::error;
+
+type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
 
 struct PpmFormatter {
     max_length: usize,
@@ -26,7 +29,7 @@ impl PpmFormatter {
         }
     }
 
-    fn write(&mut self, string: String) -> Result<(), Error> {
+    fn write(&mut self, string: String) -> Result<()> {
         if self.line.len() + self.separator.len() + string.len() > self.max_length {
             self.new_line()?;
         }
@@ -37,19 +40,19 @@ impl PpmFormatter {
         Ok(())
     }
 
-    fn new_line(&mut self) -> Result<(), Error> {
+    fn new_line(&mut self) -> Result<()> {
         write!(self.output, "{}\n", self.line)?;
         Ok(self.line.clear())
     }
 
-    fn flush(&mut self) -> Result<(), Error> {
+    fn flush(&mut self) -> Result<()> {
         if !self.line.is_empty() {
             self.new_line()?;
         }
         Ok(())
     }
 
-    fn to_string(&mut self) -> Result<String, Error> {
+    fn to_string(&mut self) -> Result<String> {
         self.flush()?;
         Ok(self.output.clone())
     }
@@ -87,7 +90,7 @@ impl Canvas {
         (value * 255.0).round() as u8
     }
 
-    pub fn to_ppm(&self) -> Result<String, Error> {
+    pub fn to_ppm(&self) -> Result<String> {
         let mut formatter = PpmFormatter::new(69, String::from(" "));
         formatter.write(String::from("P3"))?;
         formatter.new_line()?;
@@ -107,10 +110,52 @@ impl Canvas {
         Ok(result)
     }
 
-    pub fn save_to_file(&self, path: &Path) {
-        let ppm = self.to_ppm().unwrap();
-        let mut file = File::create(&path).unwrap();
-        file.write_all(ppm.as_bytes()).unwrap();
+    pub fn to_rgb_vec(&self) -> Vec<u8> {
+        let mut result = Vec::with_capacity(self.width * self.height * 3);
+        for row in &self.pixels {
+            for pixel in row {
+                result.push(Self::scalar_to_u8(pixel.red()));
+                result.push(Self::scalar_to_u8(pixel.green()));
+                result.push(Self::scalar_to_u8(pixel.blue()));
+            }
+        }
+        result
+    }
+
+    fn save_to_ppm(&self, path: &Path) -> Result<()> {
+        let ppm = self.to_ppm()?;
+        let mut file = File::create(&path)?;
+        file.write_all(ppm.as_bytes())?;
+        Ok(())
+    }
+
+    fn save_to_png(&self, path: &Path) -> Result<()> {
+        let file = File::create(path)?;
+        let ref mut w = BufWriter::new(file);
+
+        let mut encoder = png::Encoder::new(w, self.width as u32, self.height as u32);
+        encoder.set_color(png::ColorType::RGB);
+        encoder.set_depth(png::BitDepth::Eight);
+        let mut writer = encoder.write_header()?;
+
+        let data = self.to_rgb_vec();
+        writer.write_image_data(&data)?;
+        Ok(())
+    }
+
+    pub fn save_to_file(&self, path: &Path) -> Result<()> {
+        match path.extension() {
+            Some(ext) => {
+                if ext == OsStr::new("ppm") {
+                    self.save_to_ppm(path)
+                } else if ext == OsStr::new("png") {
+                    self.save_to_png(path)
+                } else {
+                    Err(format!("Unsupported extension: {:?}", ext).into())
+                }
+            }
+            None => Err("Unspecified extension".into())
+        }
     }
 }
 
@@ -193,5 +238,20 @@ mod tests {
         let c = Canvas::new(5, 3);
         let ppm = c.to_ppm().unwrap();
         assert_eq!(ppm.chars().last().unwrap(), '\n');
+    }
+
+    #[test]
+    fn convert_to_u8_array() {
+        let mut c = Canvas::new(3, 2);
+        c.write_pixel(0, 0, Tuple::color(1., 0., 0.));
+        c.write_pixel(1, 0, Tuple::color(0., 1., 0.));
+        c.write_pixel(2, 0, Tuple::color(1., 1., 1.));
+        c.write_pixel(0, 1, Tuple::color(0., 0., 1.));
+        c.write_pixel(1, 1, Tuple::color(1., 1., 0.));
+        c.write_pixel(2, 1, Tuple::color(0., 0., 0.));
+
+        let data = c.to_rgb_vec();
+
+        assert_eq!(data, vec![255, 0, 0, 0, 255, 0, 255, 255, 255, 0, 0, 255, 255, 255, 0, 0, 0, 0]);
     }
 }
