@@ -1,3 +1,4 @@
+use lib::shapes::Shape;
 use lib::tuples::Scalar;
 use lib::lights::PointLight;
 use lib::materials::Material;
@@ -19,11 +20,11 @@ fn main() {
     let half = wall_size / 2.;
 
     let mut canvas = Canvas::new(canvas_pixels, canvas_pixels);
-    let mut shape = Sphere::new();
+    let mut sphere = Sphere::new();
 
     let mut material = Material::new();
     material.color = Tuple::color(1., 0.2, 1.);
-    shape.material = material;
+    (&mut sphere as &mut dyn Shape).set_material(material);
 
     let light = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
 
@@ -33,13 +34,13 @@ fn main() {
             let world_x = - half + pixel_size * (x as Scalar);
             let position = Tuple::point(world_x, world_y, wall_z);
             let r = Ray::new(ray_origin, (position - ray_origin).normalize());
-            let xs = shape.intersect(&r);
+            let xs = (&sphere as &dyn Shape).intersect(&r);
 
             for hit in hit(&xs) {
                 let point = r.position(hit.t);
                 let normal = hit.object.normal_at(&point);
                 let eye = - r.direction;
-                let color = hit.object.material.lighting(&light, &point, &eye, &normal, false);
+                let color = hit.object.material().lighting(&light, &point, &eye, &normal, false);
                 canvas.write_pixel(x, y, color);
             }
         }

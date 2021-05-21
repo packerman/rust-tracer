@@ -1,3 +1,4 @@
+use lib::shapes::Shape;
 use std::path::Path;
 use lib::world::World;
 use std::f64::consts::*;
@@ -43,47 +44,47 @@ fn main() {
     let mut pinky_material = sphere_material.clone();
     pinky_material.color = Tuple::color(0.1, 0.5, 1.);
 
-    let mut backdrop = Sphere::new();
-    backdrop.material.color = Tuple::color(1., 1., 1.);
-    backdrop.material.ambient = 0.;
-    backdrop.material.diffuse = 0.5;
-    backdrop.material.specular = 0.;
+    let mut backdrop: Box<dyn Shape> = Box::new(Sphere::new());
+    backdrop.properties_mut().material.color = Tuple::color(1., 1., 1.);
+    backdrop.properties_mut().material.ambient = 0.;
+    backdrop.properties_mut().material.diffuse = 0.5;
+    backdrop.properties_mut().material.specular = 0.;
     backdrop.set_transform(Transformation::translation(0., 0., 20.) *
                             Transformation::scaling(200., 200., 0.01));
 
-    let mut wrist = Sphere::new();
-    wrist.material = wrist_material;
+    let mut wrist: Box<dyn Shape> = Box::new(Sphere::new());
+    wrist.properties_mut().material = wrist_material;
     wrist.set_transform(Transformation::rotation_z(FRAC_PI_4) *
                         Transformation::translation(-4., 0., -21.) *
                         Transformation::scaling(3., 3., 3.));
 
-    let mut palm = Sphere::new();
-    palm.material = palm_material;
+    let mut palm: Box<dyn Shape> = Box::new(Sphere::new());
+    palm.set_material(palm_material);
     palm.set_transform(Transformation::translation(0., 0., -15.) *
                         Transformation::scaling(4., 3., 3.));
 
-    let mut thumb = Sphere::new();
-    thumb.material = thumb_material;
+    let mut thumb: Box<dyn Shape> = Box::new(Sphere::new());
+    thumb.properties_mut().material = thumb_material;
     thumb.set_transform(Transformation::translation(-2., 2., -16.) *
                         Transformation::scaling(1., 3., 1.));
 
-    let mut index = Sphere::new();
-    index.material = index_material;
+    let mut index: Box<dyn Shape> = Box::new(Sphere::new());
+    index.properties_mut().material = index_material;
     index.set_transform(Transformation::translation(3., 2., -22.) *
                         Transformation::scaling(3., 0.75, 0.75));
 
-    let mut middle = Sphere::new();
-    middle.material = middle_material;
+    let mut middle: Box<dyn Shape> = Box::new(Sphere::new());
+    middle.properties_mut().material = middle_material;
     middle.set_transform(Transformation::translation(4., 1., -19.) *
                         Transformation::scaling(3., 0.75, 0.75));
 
-    let mut ring = Sphere::new();
-    ring.material = ring_material;
+    let mut ring: Box<dyn Shape> = Box::new(Sphere::new());
+    ring.properties_mut().material = ring_material;
     ring.set_transform(Transformation::translation(4., 0., -18.) *
                         Transformation::scaling(3., 0.75, 0.75));
 
-    let mut pinky = Sphere::new();
-    pinky.material = pinky_material;
+    let mut pinky: Box<dyn Shape> = Box::new(Sphere::new());
+    pinky.properties_mut().material = pinky_material;
     pinky.set_transform(Transformation::translation(3., -1.5, -20.) *
                         Transformation::rotation_z(- PI / 10.) *
                         Transformation::translation(1., 0., 0.) *

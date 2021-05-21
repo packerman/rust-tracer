@@ -9,6 +9,8 @@ pub mod lights;
 pub mod materials;
 pub mod world;
 pub mod camera;
+pub mod shapes;
+pub mod planes;
 
 #[cfg(test)]
 mod tests {

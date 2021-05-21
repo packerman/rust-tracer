@@ -1,3 +1,4 @@
+use lib::shapes::Shape;
 use lib::tuples::Scalar;
 use lib::intersections::hit;
 use std::io::Write;
@@ -26,7 +27,7 @@ fn main() {
             let world_x = - half + pixel_size * (x as Scalar);
             let position = Tuple::point(world_x, world_y, wall_z);
             let r = Ray::new(ray_origin, (position - ray_origin).normalize());
-            let xs = shape.intersect(&r);
+            let xs = (&shape as &dyn Shape).intersect(&r);
 
             if hit(&xs).is_some() {
                 canvas.write_pixel(x, y, color);
