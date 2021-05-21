@@ -8,16 +8,16 @@ use crate::materials::Material;
 use crate::transformations::Transformation;
 
 #[derive(Debug)]
-pub struct BaseShape {
+pub struct ShapeProperties {
     transform: Transformation,
     inverted_transform: Transformation,
     pub material: Material,
 }
 
-impl BaseShape {
+impl ShapeProperties {
 
-    pub fn new() -> BaseShape {
-        BaseShape {
+    pub fn new() -> ShapeProperties {
+        ShapeProperties {
             transform: Transformation::IDENTITY,
             inverted_transform: Transformation::IDENTITY,
             material: Material::new(),
@@ -40,9 +40,9 @@ impl BaseShape {
 
 pub trait Shape: Debug {
 
-    fn base(&self) -> &BaseShape;
+    fn properties(&self) -> &ShapeProperties;
 
-    fn base_mut(&mut self) -> &mut BaseShape;
+    fn properties_mut(&mut self) -> &mut ShapeProperties;
 
     fn local_intersect(&self, ray: &Ray) -> Vec<Intersection>;
 
@@ -52,23 +52,23 @@ pub trait Shape: Debug {
 impl<'a> dyn Shape + 'a {
 
     pub fn transform(&self) -> &Transformation {
-        self.base().transform()
+        self.properties().transform()
     }
 
     pub fn inversed_transform(&self) -> &Transformation {
-        self.base().inversed_transform()
+        self.properties().inversed_transform()
     }
 
     pub fn set_transform(&mut self, transform: Transformation) {
-        self.base_mut().set_transform(transform);
+        self.properties_mut().set_transform(transform);
     }
 
     pub fn material(&self) -> &Material {
-        &self.base().material
+        &self.properties().material
     }
 
     pub fn set_material(&mut self, material: Material) {
-        self.base_mut().material = material;
+        self.properties_mut().material = material;
     }
 
     pub fn intersect(&self, ray: &Ray) -> Vec<Intersection> {
@@ -95,24 +95,24 @@ mod tests {
     use approx::assert_abs_diff_eq;
 
     #[derive(Debug)]
-    struct TestShape(BaseShape);
+    struct TestShape(ShapeProperties);
 
     impl TestShape {
 
         fn new() -> TestShape {
             TestShape {
-                0: BaseShape::new()
+                0: ShapeProperties::new()
             }
         }
     }
 
     impl Shape for TestShape {
 
-        fn base(&self) -> &BaseShape {
+        fn properties(&self) -> &ShapeProperties {
             &self.0
         }
 
-        fn base_mut(&mut self) -> &mut BaseShape {
+        fn properties_mut(&mut self) -> &mut ShapeProperties {
             &mut self.0
         }
 

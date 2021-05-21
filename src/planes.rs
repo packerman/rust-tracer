@@ -1,31 +1,31 @@
+use crate::shapes::ShapeProperties;
 use crate::tuples::Tuple;
 use crate::tuples::Vector;
 use crate::tuples::Point;
 use crate::rays::Ray;
 use crate::intersections::Intersection;
-use crate::shapes::BaseShape;
 use crate::shapes::Shape;
 use crate::tuples::Scalar;
 
 #[derive(Debug)]
-struct Plane(BaseShape);
+pub struct Plane(ShapeProperties);
 
 impl Plane {
 
-    fn new() -> Plane {
+    pub fn new() -> Plane {
         Plane {
-            0: BaseShape::new(),
+            0: ShapeProperties::new(),
         }
     }
 }
 
 impl Shape for Plane {
 
-    fn base(&self) -> &BaseShape {
+    fn properties(&self) -> &ShapeProperties {
         &self.0
     }
 
-    fn base_mut(&mut self) -> &mut BaseShape {
+    fn properties_mut(&mut self) -> &mut ShapeProperties {
         &mut self.0
     }
 

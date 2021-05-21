@@ -1,4 +1,4 @@
-use crate::shapes::BaseShape;
+use crate::shapes::ShapeProperties;
 use crate::shapes::Shape;
 use crate::tuples::Vector;
 use crate::tuples::Point;
@@ -7,24 +7,24 @@ use crate::tuples::Tuple;
 use crate::rays::Ray;
 
 #[derive(Debug)]
-pub struct Sphere(BaseShape);
+pub struct Sphere(ShapeProperties);
 
 impl Sphere {
 
     pub fn new() -> Sphere {
         Sphere {
-            0: BaseShape::new()
+            0: ShapeProperties::new()
         }
     }
 }
 
 impl Shape for Sphere {
 
-    fn base(&self) -> &BaseShape {
+    fn properties(&self) -> &ShapeProperties {
         &self.0
     }
 
-    fn base_mut(&mut self) -> &mut BaseShape {
+    fn properties_mut(&mut self) -> &mut ShapeProperties {
         &mut self.0
     }
 
