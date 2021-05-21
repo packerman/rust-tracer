@@ -59,5 +59,5 @@ fn main() {
                                                 &Tuple::vector(0., 1., 0.)));
 
     let canvas = camera.render(&world);
-    canvas.save_to_file(Path::new("scene.ppm"));
+    canvas.save_to_file(Path::new("scene.ppm")).unwrap();
 }

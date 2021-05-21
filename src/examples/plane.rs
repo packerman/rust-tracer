@@ -41,11 +41,12 @@ fn main() {
 
     let world = World::with_objects_and_light(vec![floor, middle, right, left], light_source);
 
-    let mut camera = Camera::new(100, 50, FRAC_PI_3);
+    let mut camera = Camera::new(1280, 800, FRAC_PI_3);
     camera.set_transform(Transformation::view(&Tuple::point(0., 1.5, -5.),
                                                 &Tuple::point(0., 1., 0.),
                                                 &Tuple::vector(0., 1., 0.)));
 
     let canvas = camera.render(&world);
-    canvas.save_to_file(Path::new("plane.ppm"));
+    canvas.save_to_file(Path::new("plane.ppm")).unwrap();
+    canvas.save_to_file(Path::new("plane.png")).unwrap();
 }
