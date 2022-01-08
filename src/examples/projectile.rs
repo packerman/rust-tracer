@@ -1,10 +1,10 @@
-use lib::tuples::Tuple;
-use std::io::Write;
-use std::fs::File;
-use std::path::Path;
-use lib::tuples::Point;
-use lib::tuples::Vector;
 use lib::canvas::Canvas;
+use lib::tuples::Point;
+use lib::tuples::Tuple;
+use lib::tuples::Vector;
+use std::fs::File;
+use std::io::Write;
+use std::path::Path;
 
 struct Projectile {
     position: Point,
@@ -17,7 +17,6 @@ struct Environment {
 }
 
 impl Environment {
-
     fn tick(&self, proj: &Projectile) -> Projectile {
         Projectile {
             position: proj.position + proj.velocity,

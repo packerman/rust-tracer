@@ -1,10 +1,10 @@
-use crate::tuples::Scalar;
 use crate::rays::Ray;
-use crate::tuples::Vector;
+use crate::spheres::Sphere;
 use crate::tuples::Point;
+use crate::tuples::Scalar;
+use crate::tuples::Vector;
 use std::cmp::Ordering;
 use std::ptr;
-use crate::spheres::Sphere;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Intersection<'a> {
@@ -13,24 +13,21 @@ pub struct Intersection<'a> {
 }
 
 impl PartialEq for Intersection<'_> {
-
     fn eq(&self, other: &Intersection<'_>) -> bool {
         self.t == other.t && ptr::eq(self.object, other.object)
     }
 }
 
 impl Intersection<'_> {
-
     pub fn new(t: Scalar, object: &Sphere) -> Intersection {
         Intersection { t, object }
     }
 }
 
 impl PartialOrd for Intersection<'_> {
-
     fn partial_cmp(&self, other: &Intersection) -> Option<Ordering> {
         self.t.partial_cmp(&other.t)
-     }
+    }
 }
 
 pub fn intersections<'a>(mut instersections: Vec<Intersection>) -> Vec<Intersection> {
@@ -55,15 +52,14 @@ pub struct Computations<'a> {
 const EPSILON: Scalar = 0.00001;
 
 impl Computations<'_> {
-
     pub fn prepare<'a>(intersection: &Intersection<'a>, ray: &Ray) -> Computations<'a> {
         let point = ray.position(intersection.t);
         let mut normalv = intersection.object.normal_at(&point);
-        let eyev = - ray.direction;
+        let eyev = -ray.direction;
         let inside: bool;
         if normalv.dot(&eyev) < 0. {
             inside = true;
-            normalv = - normalv;
+            normalv = -normalv;
         } else {
             inside = false;
         }
@@ -82,10 +78,10 @@ impl Computations<'_> {
 #[cfg(test)]
 mod tests {
 
-    use crate::transformations::Transformation;
-    use crate::rays::Ray;
-    use crate::tuples::Tuple;
     use super::*;
+    use crate::rays::Ray;
+    use crate::transformations::Transformation;
+    use crate::tuples::Tuple;
     use std::ptr;
 
     #[test]
@@ -209,7 +205,7 @@ mod tests {
 
         let comps = Computations::prepare(&i, &r);
 
-        assert!(comps.over_point.z < - EPSILON / 2.);
+        assert!(comps.over_point.z < -EPSILON / 2.);
         assert!(comps.point.z > comps.over_point.z);
     }
 }

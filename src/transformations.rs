@@ -1,53 +1,93 @@
-
+use crate::matrices::Matrix4;
+use crate::tuples::Point;
 use crate::tuples::Scalar;
 use crate::tuples::Vector;
-use crate::tuples::Point;
-use crate::matrices::Matrix4;
 
 pub type Transformation = Matrix4;
 
 impl Transformation {
-
     pub fn translation(x: Scalar, y: Scalar, z: Scalar) -> Transformation {
-        Matrix4::new(1., 0., 0., x,
-                    0., 1., 0., y,
-                    0., 0., 1., z,
-                    0., 0., 0., 1.)
+        Matrix4::new(1., 0., 0., x, 0., 1., 0., y, 0., 0., 1., z, 0., 0., 0., 1.)
     }
 
     pub fn scaling(x: Scalar, y: Scalar, z: Scalar) -> Transformation {
-        Matrix4::new(x, 0., 0., 0.,
-                    0., y, 0., 0.,
-                    0., 0., z, 0.,
-                    0., 0., 0., 1.)
+        Matrix4::new(x, 0., 0., 0., 0., y, 0., 0., 0., 0., z, 0., 0., 0., 0., 1.)
     }
 
     pub fn rotation_x(r: Scalar) -> Transformation {
-        Matrix4::new(1., 0., 0., 0.,
-                        0., r.cos(), - r.sin(), 0.,
-                        0., r.sin(), r.cos(), 0.,
-                        0., 0., 0., 1.)
+        Matrix4::new(
+            1.,
+            0.,
+            0.,
+            0.,
+            0.,
+            r.cos(),
+            -r.sin(),
+            0.,
+            0.,
+            r.sin(),
+            r.cos(),
+            0.,
+            0.,
+            0.,
+            0.,
+            1.,
+        )
     }
 
     pub fn rotation_y(r: Scalar) -> Transformation {
-        Matrix4::new(r.cos(), 0., r.sin(), 0.,
-                        0., 1., 0., 0.,
-                        - r.sin(), 0., r.cos(), 0.,
-                        0., 0., 0., 1.)
+        Matrix4::new(
+            r.cos(),
+            0.,
+            r.sin(),
+            0.,
+            0.,
+            1.,
+            0.,
+            0.,
+            -r.sin(),
+            0.,
+            r.cos(),
+            0.,
+            0.,
+            0.,
+            0.,
+            1.,
+        )
     }
 
     pub fn rotation_z(r: Scalar) -> Transformation {
-        Matrix4::new(r.cos(), - r.sin(), 0., 0.,
-                        r.sin(), r.cos(), 0., 0.,
-                        0., 0., 1., 0.,
-                        0., 0., 0., 1.)
+        Matrix4::new(
+            r.cos(),
+            -r.sin(),
+            0.,
+            0.,
+            r.sin(),
+            r.cos(),
+            0.,
+            0.,
+            0.,
+            0.,
+            1.,
+            0.,
+            0.,
+            0.,
+            0.,
+            1.,
+        )
     }
 
-    pub fn shearing(x_y: Scalar, x_z: Scalar, y_x: Scalar, y_z: Scalar, z_x: Scalar, z_y: Scalar) -> Transformation {
-        Matrix4::new(1., x_y, x_z, 0.,
-            y_x, 1., y_z, 0.,
-            z_x, z_y, 1., 0.,
-            0., 0., 0., 1.)
+    pub fn shearing(
+        x_y: Scalar,
+        x_z: Scalar,
+        y_x: Scalar,
+        y_z: Scalar,
+        z_x: Scalar,
+        z_y: Scalar,
+    ) -> Transformation {
+        Matrix4::new(
+            1., x_y, x_z, 0., y_x, 1., y_z, 0., z_x, z_y, 1., 0., 0., 0., 0., 1.,
+        )
     }
 
     pub fn view(from: &Point, to: &Point, up: &Vector) -> Transformation {
@@ -55,22 +95,22 @@ impl Transformation {
         let left = forward.cross(&up.normalize());
         let true_up = left.cross(&forward);
 
-        let orientation = Matrix4::new(left.x, left.y, left.z, 0.,
-                                        true_up.x, true_up.y, true_up.z, 0.,
-                                        - forward.x, - forward.y, - forward.z, 0.,
-                                        0., 0., 0., 1.);
+        let orientation = Matrix4::new(
+            left.x, left.y, left.z, 0., true_up.x, true_up.y, true_up.z, 0., -forward.x,
+            -forward.y, -forward.z, 0., 0., 0., 0., 1.,
+        );
 
-        orientation * Self::translation(- from.x, - from.y, - from.z)
+        orientation * Self::translation(-from.x, -from.y, -from.z)
     }
 }
 
 #[cfg(test)]
 mod tests {
 
-    use std::f64::consts::*;
-    use crate::tuples::Tuple;
     use super::*;
+    use crate::tuples::Tuple;
     use approx::assert_abs_diff_eq;
+    use std::f64::consts::*;
 
     #[test]
     fn multiplying_by_translation_matrix() {
@@ -136,7 +176,7 @@ mod tests {
         let half_quarter = Transformation::rotation_x(FRAC_PI_4);
         let full_quarter = Transformation::rotation_x(FRAC_PI_2);
 
-        assert_abs_diff_eq!(half_quarter * p, Tuple::point(0., SQRT_2/2., SQRT_2/2.));
+        assert_abs_diff_eq!(half_quarter * p, Tuple::point(0., SQRT_2 / 2., SQRT_2 / 2.));
         assert_abs_diff_eq!(full_quarter * p, Tuple::point(0., 0., 1.));
     }
 
@@ -146,7 +186,7 @@ mod tests {
         let half_quarter = Transformation::rotation_x(FRAC_PI_4);
         let inv = half_quarter.inverse();
 
-        assert_abs_diff_eq!(inv * p, Tuple::point(0., SQRT_2 / 2., - SQRT_2 / 2.));
+        assert_abs_diff_eq!(inv * p, Tuple::point(0., SQRT_2 / 2., -SQRT_2 / 2.));
     }
 
     #[test]
@@ -165,8 +205,11 @@ mod tests {
         let half_quarter = Transformation::rotation_z(FRAC_PI_4);
         let full_quarter = Transformation::rotation_z(FRAC_PI_2);
 
-        assert_abs_diff_eq!(half_quarter * p, Tuple::point(- SQRT_2 / 2., SQRT_2 / 2., 0.));
-        assert_abs_diff_eq!(full_quarter * p, Tuple::point(- 1., 0., 0.));
+        assert_abs_diff_eq!(
+            half_quarter * p,
+            Tuple::point(-SQRT_2 / 2., SQRT_2 / 2., 0.)
+        );
+        assert_abs_diff_eq!(full_quarter * p, Tuple::point(-1., 0., 0.));
     }
 
     #[test]
@@ -244,7 +287,7 @@ mod tests {
         let to = Tuple::point(0., 0., -1.);
         let up = Tuple::vector(0., 1., 0.);
 
-        let t = Transformation::view(&from, &to, & up);
+        let t = Transformation::view(&from, &to, &up);
 
         assert_eq!(t, Transformation::IDENTITY);
     }
@@ -255,7 +298,7 @@ mod tests {
         let to = Tuple::point(0., 0., 1.);
         let up = Tuple::vector(0., 1., 0.);
 
-        let t = Transformation::view(&from, &to, & up);
+        let t = Transformation::view(&from, &to, &up);
 
         assert_eq!(t, Transformation::scaling(-1., 1., -1.));
     }
@@ -266,7 +309,7 @@ mod tests {
         let to = Tuple::point(0., 0., 0.);
         let up = Tuple::vector(0., 1., 0.);
 
-        let t = Transformation::view(&from, &to, & up);
+        let t = Transformation::view(&from, &to, &up);
 
         assert_eq!(t, Transformation::translation(0., 0., -8.));
     }
@@ -277,13 +320,15 @@ mod tests {
         let to = Tuple::point(4., -2., 8.);
         let up = Tuple::vector(1., 1., 0.);
 
-        let t = Transformation::view(&from, &to, & up);
+        let t = Transformation::view(&from, &to, &up);
 
-        assert_abs_diff_eq!(t, Matrix4::new(
-            - 0.50709, 0.50709, 0.67612, - 2.36643,
-            0.76772, 0.60609, 0.12122, - 2.82843,
-            - 0.35857, 0.59761, - 0.71714, 0.,
-            0., 0., 0., 1.
-        ), epsilon = 0.00001);
+        assert_abs_diff_eq!(
+            t,
+            Matrix4::new(
+                -0.50709, 0.50709, 0.67612, -2.36643, 0.76772, 0.60609, 0.12122, -2.82843,
+                -0.35857, 0.59761, -0.71714, 0., 0., 0., 0., 1.
+            ),
+            epsilon = 0.00001
+        );
     }
 }

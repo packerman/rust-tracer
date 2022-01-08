@@ -1,12 +1,12 @@
-use lib::tuples::Scalar;
+use lib::canvas::Canvas;
 use lib::intersections::hit;
-use std::io::Write;
-use std::fs::File;
-use std::path::Path;
 use lib::rays::Ray;
 use lib::spheres::Sphere;
-use lib::canvas::Canvas;
+use lib::tuples::Scalar;
 use lib::tuples::Tuple;
+use std::fs::File;
+use std::io::Write;
+use std::path::Path;
 
 fn main() {
     let ray_origin = Tuple::point(0., 0., -5.);
@@ -23,7 +23,7 @@ fn main() {
     for y in 0..canvas_pixels {
         let world_y = half - pixel_size * (y as Scalar);
         for x in 0..canvas_pixels {
-            let world_x = - half + pixel_size * (x as Scalar);
+            let world_x = -half + pixel_size * (x as Scalar);
             let position = Tuple::point(world_x, world_y, wall_z);
             let r = Ray::new(ray_origin, (position - ray_origin).normalize());
             let xs = shape.intersect(&r);

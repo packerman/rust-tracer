@@ -1,7 +1,7 @@
-use crate::tuples::Scalar;
 use crate::transformations::Transformation;
-use crate::tuples::Vector;
 use crate::tuples::Point;
+use crate::tuples::Scalar;
+use crate::tuples::Vector;
 
 pub struct Ray {
     pub origin: Point,
@@ -9,12 +9,8 @@ pub struct Ray {
 }
 
 impl Ray {
-
     pub fn new(origin: Point, direction: Vector) -> Ray {
-        Ray {
-            origin,
-            direction,
-        }
+        Ray { origin, direction }
     }
 
     pub fn position(&self, t: Scalar) -> Point {
@@ -29,8 +25,8 @@ impl Ray {
 #[cfg(test)]
 mod tests {
 
-    use crate::transformations::Transformation;
     use super::*;
+    use crate::transformations::Transformation;
     use crate::tuples::Tuple;
 
     #[test]

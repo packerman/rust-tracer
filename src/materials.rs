@@ -1,10 +1,9 @@
-
-use crate::tuples::Scalar;
-use crate::tuples::Vector;
-use crate::tuples::Point;
 use crate::lights::PointLight;
 use crate::tuples::Color;
+use crate::tuples::Point;
+use crate::tuples::Scalar;
 use crate::tuples::Tuple;
+use crate::tuples::Vector;
 
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Material {
@@ -16,7 +15,6 @@ pub struct Material {
 }
 
 impl Material {
-
     pub const fn new() -> Material {
         Material {
             color: Tuple::color(1., 1., 1.),
@@ -27,7 +25,14 @@ impl Material {
         }
     }
 
-    pub fn lighting(&self, light: &PointLight, point: &Point, eyev: &Vector, normalv: &Vector, in_shadow: bool) -> Color {
+    pub fn lighting(
+        &self,
+        light: &PointLight,
+        point: &Point,
+        eyev: &Vector,
+        normalv: &Vector,
+        in_shadow: bool,
+    ) -> Color {
         let effective_color = self.color * light.intensity;
         let lightv = (light.position - *point).normalize();
         let ambient = effective_color * self.ambient;
@@ -40,7 +45,7 @@ impl Material {
             specular = Color::BLACK;
         } else {
             diffuse = effective_color * self.diffuse * light_dot_normal;
-            let reflectv = (- lightv).reflect(normalv);
+            let reflectv = (-lightv).reflect(normalv);
             let reflect_dot_eye = reflectv.dot(eyev);
             if reflect_dot_eye < 0. {
                 specular = Color::BLACK;
@@ -71,12 +76,12 @@ mod tests {
 
     mod lighting_tests {
 
-        use std::f64::consts::*;
         use super::*;
-        use approx::assert_abs_diff_eq;
-        use crate::tuples::Point;
-        use crate::materials::Tuple;
         use crate::materials::Material;
+        use crate::materials::Tuple;
+        use crate::tuples::Point;
+        use approx::assert_abs_diff_eq;
+        use std::f64::consts::*;
 
         const M: Material = Material::new();
         const POSITION: Point = Tuple::point(0., 0., 0.);
@@ -93,7 +98,7 @@ mod tests {
 
         #[test]
         fn ligthing_with_the_eye_between_light_and_surface_eye_offset_45_deg() {
-            let eyev = Tuple::vector(0., SQRT_2 / 2., - SQRT_2 / 2.);
+            let eyev = Tuple::vector(0., SQRT_2 / 2., -SQRT_2 / 2.);
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 0., -10.), Tuple::color(1., 1., 1.));
 
@@ -108,19 +113,26 @@ mod tests {
             let light = PointLight::new(Tuple::point(0., 10., -10.), Tuple::color(1., 1., 1.));
 
             let result = M.lighting(&light, &POSITION, &eyev, &normalv, false);
-            assert_abs_diff_eq!(result, Tuple::color(0.7364, 0.7364, 0.7364), epsilon = 0.00001);
+            assert_abs_diff_eq!(
+                result,
+                Tuple::color(0.7364, 0.7364, 0.7364),
+                epsilon = 0.00001
+            );
         }
 
         #[test]
         fn ligthing_with_the_eye_in_the_path_of_the_reflection_vector() {
-            let eyev = Tuple::vector(0., - SQRT_2 / 2., - SQRT_2 / 2.);
+            let eyev = Tuple::vector(0., -SQRT_2 / 2., -SQRT_2 / 2.);
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 10., -10.), Tuple::color(1., 1., 1.));
 
             let result = M.lighting(&light, &POSITION, &eyev, &normalv, false);
-            assert_abs_diff_eq!(result, Tuple::color(1.6364, 1.6364, 1.6364), epsilon = 0.0001);
+            assert_abs_diff_eq!(
+                result,
+                Tuple::color(1.6364, 1.6364, 1.6364),
+                epsilon = 0.0001
+            );
         }
-
 
         #[test]
         fn ligthing_with_the_light_behind_the_surface() {
