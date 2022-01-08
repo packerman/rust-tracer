@@ -1,16 +1,15 @@
-
-use crate::tuples::Point;
 use crate::intersections::hit;
-use crate::tuples::Color;
-use crate::intersections::Computations;
 use crate::intersections::intersections;
+use crate::intersections::Computations;
 use crate::intersections::Intersection;
-use crate::rays::Ray;
-use crate::transformations::Transformation;
-use crate::materials::Material;
-use crate::tuples::Tuple;
 use crate::lights::PointLight;
+use crate::materials::Material;
+use crate::rays::Ray;
 use crate::spheres::Sphere;
+use crate::transformations::Transformation;
+use crate::tuples::Color;
+use crate::tuples::Point;
+use crate::tuples::Tuple;
 
 pub struct World {
     objects: Vec<Sphere>,
@@ -18,13 +17,18 @@ pub struct World {
 }
 
 impl World {
-
     fn new() -> World {
-        World { objects: vec![], lights: vec![] }
+        World {
+            objects: vec![],
+            lights: vec![],
+        }
     }
 
     pub fn with_objects_and_light<'a>(objects: Vec<Sphere>, light: PointLight) -> World {
-        World { objects, lights: vec![light] }
+        World {
+            objects,
+            lights: vec![light],
+        }
     }
 
     pub fn default() -> World {
@@ -56,10 +60,17 @@ impl World {
     }
 
     fn shade_hit(&self, comps: &Computations) -> Color {
-        self.lights.iter()
+        self.lights
+            .iter()
             .map(|light| {
                 let shadowed = self.is_shadowed(&comps.over_point, light);
-                comps.object.material.lighting(light, &comps.over_point, &comps.eyev, &comps.normalv, shadowed)
+                comps.object.material.lighting(
+                    light,
+                    &comps.over_point,
+                    &comps.eyev,
+                    &comps.normalv,
+                    shadowed,
+                )
             })
             .sum()
     }
@@ -93,9 +104,9 @@ impl World {
 #[cfg(test)]
 mod tests {
 
+    use super::*;
     use crate::intersections::Computations;
     use crate::rays::Ray;
-    use super::*;
     use approx::assert_abs_diff_eq;
 
     #[test]
@@ -164,7 +175,11 @@ mod tests {
         let comps = Computations::prepare(&i, &r);
         let c = w.shade_hit(&comps);
 
-        assert_abs_diff_eq!(c, Tuple::color(0.90498, 0.90498, 0.90498), epsilon = 0.00001);
+        assert_abs_diff_eq!(
+            c,
+            Tuple::color(0.90498, 0.90498, 0.90498),
+            epsilon = 0.00001
+        );
     }
 
     #[test]

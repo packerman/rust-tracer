@@ -1,5 +1,5 @@
-use crate::tuples::Point;
 use crate::tuples::Color;
+use crate::tuples::Point;
 
 #[derive(PartialEq, Debug)]
 pub struct PointLight {
@@ -8,9 +8,11 @@ pub struct PointLight {
 }
 
 impl PointLight {
-
     pub fn new(position: Point, intensity: Color) -> PointLight {
-        PointLight { position, intensity }
+        PointLight {
+            position,
+            intensity,
+        }
     }
 }
 

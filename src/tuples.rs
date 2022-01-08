@@ -1,7 +1,7 @@
-use std::iter::Sum;
-use std::ops::AddAssign;
 use approx::AbsDiffEq;
+use std::iter::Sum;
 use std::ops;
+use std::ops::AddAssign;
 
 pub type Scalar = f64;
 
@@ -18,11 +18,8 @@ pub type Vector = Tuple;
 pub type Color = Tuple;
 
 impl Tuple {
-
     pub const fn new(x: Scalar, y: Scalar, z: Scalar, w: Scalar) -> Tuple {
-        Tuple {
-            x, y, z, w,
-        }
+        Tuple { x, y, z, w }
     }
 
     pub const fn point(x: Scalar, y: Scalar, z: Scalar) -> Point {
@@ -42,7 +39,7 @@ impl Tuple {
     }
 
     pub fn magnitude(&self) -> Scalar {
-        (self.x*self.x + self.y*self.y + self.z*self.z + self.w*self.w).sqrt()
+        (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
     }
 
     pub fn normalize(&self) -> Tuple {
@@ -51,13 +48,15 @@ impl Tuple {
     }
 
     pub fn dot(&self, other: &Tuple) -> Scalar {
-        self.x*other.x + self.y*other.y + self.z*other.z + self.w*other.w
+        self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
     }
 
     pub fn cross(&self, other: &Tuple) -> Vector {
-        Self::vector(self.y*other.z - self.z*other.y,
-                        self.z*other.x - self.x*other.z,
-                        self.x*other.y - self.y*other.x)
+        Self::vector(
+            self.y * other.z - self.z * other.y,
+            self.z * other.x - self.x * other.z,
+            self.x * other.y - self.y * other.x,
+        )
     }
 
     pub fn reflect(&self, normal: &Tuple) -> Tuple {
@@ -84,77 +83,94 @@ impl Tuple {
 }
 
 impl ops::Add<Tuple> for Tuple {
-
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
-        Tuple::new(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
-     }
+        Tuple::new(
+            self.x + other.x,
+            self.y + other.y,
+            self.z + other.z,
+            self.w + other.w,
+        )
+    }
 }
 
 impl ops::Sub for Tuple {
-
     type Output = Self;
 
     fn sub(self, other: Self) -> Self {
-        Tuple::new(self.x - other.x, self.y - other.y, self.z - other.z, self.w - other.w)
-     }
+        Tuple::new(
+            self.x - other.x,
+            self.y - other.y,
+            self.z - other.z,
+            self.w - other.w,
+        )
+    }
 }
 
 impl ops::Neg for Tuple {
-
     type Output = Self;
 
     fn neg(self) -> Self {
         Tuple::new(-self.x, -self.y, -self.z, -self.w)
-     }
+    }
 }
 
 impl ops::Mul<Scalar> for Tuple {
-
     type Output = Self;
 
     fn mul(self, factor: Scalar) -> Self {
-        Tuple::new(self.x * factor, self.y * factor, self.z * factor, self.w * factor)
-     }
+        Tuple::new(
+            self.x * factor,
+            self.y * factor,
+            self.z * factor,
+            self.w * factor,
+        )
+    }
 }
 
 impl ops::Mul<Tuple> for Tuple {
-
     type Output = Self;
 
     fn mul(self, other: Self) -> Self {
-        Tuple::new(self.x * other.x, self.y * other.y, self.z * other.z, self.w * other.w)
-     }
+        Tuple::new(
+            self.x * other.x,
+            self.y * other.y,
+            self.z * other.z,
+            self.w * other.w,
+        )
+    }
 }
 
 impl ops::Div<Scalar> for Tuple {
-
     type Output = Self;
 
     fn div(self, factor: Scalar) -> Self {
-        Tuple::new(self.x / factor, self.y / factor, self.z / factor, self.w / factor)
-     }
+        Tuple::new(
+            self.x / factor,
+            self.y / factor,
+            self.z / factor,
+            self.w / factor,
+        )
+    }
 }
 
 impl AbsDiffEq for Tuple {
-
     type Epsilon = Scalar;
 
     fn default_epsilon() -> Self::Epsilon {
         Self::Epsilon::default_epsilon()
-     }
+    }
 
     fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
-        self.x.abs_diff_eq(&other.x, epsilon) &&
-        self.y.abs_diff_eq(&other.y, epsilon) &&
-        self.z.abs_diff_eq(&other.z, epsilon) &&
-        self.w.abs_diff_eq(&other.w, epsilon)
-     }
+        self.x.abs_diff_eq(&other.x, epsilon)
+            && self.y.abs_diff_eq(&other.y, epsilon)
+            && self.z.abs_diff_eq(&other.z, epsilon)
+            && self.w.abs_diff_eq(&other.w, epsilon)
+    }
 }
 
 impl AddAssign for Tuple {
-
     fn add_assign(&mut self, other: Self) {
         *self = Self {
             x: self.x + other.x,
@@ -162,26 +178,25 @@ impl AddAssign for Tuple {
             z: self.z + other.z,
             w: self.w + other.w,
         };
-     }
+    }
 }
 
 impl Sum for Tuple {
-
-    fn sum<I : Iterator<Item = Tuple>>(iter: I) -> Self {
+    fn sum<I: Iterator<Item = Tuple>>(iter: I) -> Self {
         let mut result = Tuple::new(0., 0., 0., 0.);
         for tuple in iter {
             result += tuple;
         }
         result
-     }
+    }
 }
 
 #[cfg(test)]
 mod tests {
 
-    use std::f64::consts::*;
     use super::*;
     use approx::assert_abs_diff_eq;
+    use std::f64::consts::*;
 
     #[test]
     fn tuple_with_w_equals_1_is_point() {
@@ -323,7 +338,11 @@ mod tests {
     #[test]
     fn normalizing_vector_2() {
         let v = Tuple::vector(1.0, 2.0, 3.0);
-        assert_abs_diff_eq!(v.normalize(), Tuple::vector(0.26726, 0.53452, 0.80178), epsilon = 0.00001);
+        assert_abs_diff_eq!(
+            v.normalize(),
+            Tuple::vector(0.26726, 0.53452, 0.80178),
+            epsilon = 0.00001
+        );
     }
 
     #[test]

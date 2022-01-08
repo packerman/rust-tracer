@@ -1,10 +1,9 @@
-
-use crate::tuples::Scalar;
 use crate::canvas::Canvas;
-use crate::world::World;
-use crate::tuples::Tuple;
 use crate::rays::Ray;
 use crate::transformations::Transformation;
+use crate::tuples::Scalar;
+use crate::tuples::Tuple;
+use crate::world::World;
 
 pub struct Camera {
     hsize: usize,
@@ -18,7 +17,6 @@ pub struct Camera {
 }
 
 impl Camera {
-
     pub fn new(hsize: usize, vsize: usize, field_of_view: Scalar) -> Camera {
         let half_view = (field_of_view / 2.).tan();
         let aspect = (hsize as Scalar) / (vsize as Scalar);
@@ -86,10 +84,10 @@ impl Camera {
 #[cfg(test)]
 mod tests {
 
-    use std::f64::consts::*;
-    use crate::tuples::Tuple;
     use super::*;
+    use crate::tuples::Tuple;
     use approx::assert_abs_diff_eq;
+    use std::f64::consts::*;
 
     #[test]
     fn constructing_a_camera() {
@@ -136,18 +134,24 @@ mod tests {
         let r = c.ray_for_pixel(0, 0);
 
         assert_eq!(r.origin, Tuple::point(0., 0., 0.));
-        assert_abs_diff_eq!(r.direction, Tuple::vector(0.66519, 0.33259, - 0.66851), epsilon = 0.00001);
+        assert_abs_diff_eq!(
+            r.direction,
+            Tuple::vector(0.66519, 0.33259, -0.66851),
+            epsilon = 0.00001
+        );
     }
 
     #[test]
     fn constructing_a_ray_when_the_camera_is_transformed() {
         let mut c = Camera::new(201, 101, FRAC_PI_2);
-        c.set_transform(Transformation::rotation_y(FRAC_PI_4) * Transformation::translation(0., -2., 5.));
+        c.set_transform(
+            Transformation::rotation_y(FRAC_PI_4) * Transformation::translation(0., -2., 5.),
+        );
 
         let r = c.ray_for_pixel(100, 50);
 
         assert_abs_diff_eq!(r.origin, Tuple::point(0., 2., -5.), epsilon = 0.000001);
-        assert_abs_diff_eq!(r.direction, Tuple::vector(SQRT_2 / 2., 0., - SQRT_2 / 2.));
+        assert_abs_diff_eq!(r.direction, Tuple::vector(SQRT_2 / 2., 0., -SQRT_2 / 2.));
     }
 
     #[test]
@@ -160,6 +164,10 @@ mod tests {
         c.set_transform(Transformation::view(&from, &to, &up));
 
         let image = c.render(&w);
-        assert_abs_diff_eq!(image.pixel_at(5, 5), Tuple::color(0.38066, 0.47583, 0.2855), epsilon = 0.00001);
+        assert_abs_diff_eq!(
+            image.pixel_at(5, 5),
+            Tuple::color(0.38066, 0.47583, 0.2855),
+            epsilon = 0.00001
+        );
     }
 }
