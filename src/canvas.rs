@@ -1,13 +1,13 @@
-use std::io::BufWriter;
-use crate::tuples::Scalar;
-use std::path::Path;
-use std::fs::File;
-use crate::tuples::Tuple;
-use std::fmt::Write;
-use std::io::Write as IOWrite;
-use std::ffi::OsStr;
 use crate::tuples::Color;
+use crate::tuples::Scalar;
+use crate::tuples::Tuple;
 use std::error;
+use std::ffi::OsStr;
+use std::fmt::Write;
+use std::fs::File;
+use std::io::BufWriter;
+use std::io::Write as IOWrite;
+use std::path::Path;
 
 type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
 
@@ -19,7 +19,6 @@ struct PpmFormatter {
 }
 
 impl PpmFormatter {
-
     fn new(max_length: usize, separator: String) -> PpmFormatter {
         PpmFormatter {
             max_length,
@@ -65,7 +64,6 @@ pub struct Canvas {
 }
 
 impl Canvas {
-
     pub fn new(width: usize, height: usize) -> Canvas {
         let mut pixels = Vec::with_capacity(height);
         for _ in 0..height {
@@ -75,7 +73,11 @@ impl Canvas {
             }
             pixels.push(row);
         }
-        Canvas { width, height, pixels }
+        Canvas {
+            width,
+            height,
+            pixels,
+        }
     }
 
     pub fn pixel_at(&self, x: usize, y: usize) -> Color {
@@ -134,7 +136,7 @@ impl Canvas {
         let ref mut w = BufWriter::new(file);
 
         let mut encoder = png::Encoder::new(w, self.width as u32, self.height as u32);
-        encoder.set_color(png::ColorType::RGB);
+        encoder.set_color(png::ColorType::Rgb);
         encoder.set_depth(png::BitDepth::Eight);
         let mut writer = encoder.write_header()?;
 
@@ -154,7 +156,7 @@ impl Canvas {
                     Err(format!("Unsupported extension: {:?}", ext).into())
                 }
             }
-            None => Err("Unspecified extension".into())
+            None => Err("Unspecified extension".into()),
         }
     }
 }
@@ -189,10 +191,7 @@ mod tests {
         let c = Canvas::new(5, 3);
         let ppm = c.to_ppm().unwrap();
         let header_lines: Vec<&str> = ppm.lines().take(3).collect();
-        assert_eq!(header_lines,
-            vec!["P3",
-                "5 3",
-                "255"]);
+        assert_eq!(header_lines, vec!["P3", "5 3", "255"]);
     }
 
     #[test]
@@ -208,10 +207,14 @@ mod tests {
         let ppm = c.to_ppm().unwrap();
 
         let pixels_lines: Vec<&str> = ppm.lines().skip(3).take(3).collect();
-        assert_eq!(pixels_lines,
-            vec!["255 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        assert_eq!(
+            pixels_lines,
+            vec![
+                "255 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
                 "0 0 0 0 0 0 0 128 0 0 0 0 0 0 0",
-                "0 0 0 0 0 0 0 0 0 0 0 0 0 0 255"]);
+                "0 0 0 0 0 0 0 0 0 0 0 0 0 0 255"
+            ]
+        );
     }
 
     #[test]
@@ -226,11 +229,15 @@ mod tests {
         let ppm = c.to_ppm().unwrap();
 
         let pixels_lines: Vec<&str> = ppm.lines().skip(3).take(4).collect();
-        assert_eq!(pixels_lines,
-            vec!["255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204",
+        assert_eq!(
+            pixels_lines,
+            vec![
+                "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204",
                 "153 255 204 153 255 204 153 255 204 153 255 204 153",
                 "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204",
-                "153 255 204 153 255 204 153 255 204 153 255 204 153"]);
+                "153 255 204 153 255 204 153 255 204 153 255 204 153"
+            ]
+        );
     }
 
     #[test]
@@ -252,6 +259,9 @@ mod tests {
 
         let data = c.to_rgb_vec();
 
-        assert_eq!(data, vec![255, 0, 0, 0, 255, 0, 255, 255, 255, 0, 0, 255, 255, 255, 0, 0, 0, 0]);
+        assert_eq!(
+            data,
+            vec![255, 0, 0, 0, 255, 0, 255, 255, 255, 0, 0, 255, 255, 255, 0, 0, 0, 0]
+        );
     }
 }
