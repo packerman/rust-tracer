@@ -1,6 +1,7 @@
 use lib::camera::Camera;
 use lib::lights::PointLight;
 use lib::materials::Material;
+use lib::shapes::Shape;
 use lib::spheres::Sphere;
 use lib::transformations::Transformation;
 use lib::tuples::Tuple;
@@ -45,7 +46,7 @@ fn main() {
     let mut pinky_material = sphere_material.clone();
     pinky_material.color = Tuple::color(0.1, 0.5, 1.);
 
-    let mut backdrop = Sphere::new();
+    let mut backdrop = Shape::sphere();
     backdrop.material.color = Tuple::color(1., 1., 1.);
     backdrop.material.ambient = 0.;
     backdrop.material.diffuse = 0.5;
@@ -54,7 +55,7 @@ fn main() {
         Transformation::translation(0., 0., 20.) * Transformation::scaling(200., 200., 0.01),
     );
 
-    let mut wrist = Sphere::new();
+    let mut wrist = Shape::sphere();
     wrist.material = wrist_material;
     wrist.set_transform(
         Transformation::rotation_z(FRAC_PI_4)
@@ -62,37 +63,37 @@ fn main() {
             * Transformation::scaling(3., 3., 3.),
     );
 
-    let mut palm = Sphere::new();
+    let mut palm = Shape::sphere();
     palm.material = palm_material;
     palm.set_transform(
         Transformation::translation(0., 0., -15.) * Transformation::scaling(4., 3., 3.),
     );
 
-    let mut thumb = Sphere::new();
+    let mut thumb = Shape::sphere();
     thumb.material = thumb_material;
     thumb.set_transform(
         Transformation::translation(-2., 2., -16.) * Transformation::scaling(1., 3., 1.),
     );
 
-    let mut index = Sphere::new();
+    let mut index = Shape::sphere();
     index.material = index_material;
     index.set_transform(
         Transformation::translation(3., 2., -22.) * Transformation::scaling(3., 0.75, 0.75),
     );
 
-    let mut middle = Sphere::new();
+    let mut middle = Shape::sphere();
     middle.material = middle_material;
     middle.set_transform(
         Transformation::translation(4., 1., -19.) * Transformation::scaling(3., 0.75, 0.75),
     );
 
-    let mut ring = Sphere::new();
+    let mut ring = Shape::sphere();
     ring.material = ring_material;
     ring.set_transform(
         Transformation::translation(4., 0., -18.) * Transformation::scaling(3., 0.75, 0.75),
     );
 
-    let mut pinky = Sphere::new();
+    let mut pinky = Shape::sphere();
     pinky.material = pinky_material;
     pinky.set_transform(
         Transformation::translation(3., -1.5, -20.)

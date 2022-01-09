@@ -5,14 +5,14 @@ use crate::intersections::Intersection;
 use crate::lights::PointLight;
 use crate::materials::Material;
 use crate::rays::Ray;
-use crate::spheres::Sphere;
+use crate::shapes::Shape;
 use crate::transformations::Transformation;
 use crate::tuples::Color;
 use crate::tuples::Point;
 use crate::tuples::Tuple;
 
 pub struct World {
-    objects: Vec<Sphere>,
+    objects: Vec<Shape>,
     lights: Vec<PointLight>,
 }
 
@@ -24,7 +24,7 @@ impl World {
         }
     }
 
-    pub fn with_objects_and_light<'a>(objects: Vec<Sphere>, light: PointLight) -> World {
+    pub fn with_objects_and_light<'a>(objects: Vec<Shape>, light: PointLight) -> World {
         World {
             objects,
             lights: vec![light],
@@ -34,20 +34,20 @@ impl World {
     pub fn default() -> World {
         let light = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
 
-        let mut s1 = Sphere::new();
+        let mut s1 = Shape::sphere();
         let mut m1 = Material::new();
         m1.color = Tuple::color(0.8, 1., 0.6);
         m1.diffuse = 0.7;
         m1.specular = 0.2;
         s1.material = m1;
 
-        let mut s2 = Sphere::new();
+        let mut s2 = Shape::sphere();
         s2.set_transform(Transformation::scaling(0.5, 0.5, 0.5));
 
         World::with_objects_and_light(vec![s1, s2], light)
     }
 
-    fn contains(&self, object: &Sphere) -> bool {
+    fn contains(&self, object: &Shape) -> bool {
         self.objects.contains(object)
     }
 
@@ -120,14 +120,14 @@ mod tests {
     #[test]
     fn the_default_world() {
         let light = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
-        let mut s1 = Sphere::new();
+        let mut s1 = Shape::sphere();
         let mut m1 = Material::new();
         m1.color = Tuple::color(0.8, 1., 0.6);
         m1.diffuse = 0.7;
         m1.specular = 0.2;
         s1.material = m1;
 
-        let mut s2 = Sphere::new();
+        let mut s2 = Shape::sphere();
         s2.set_transform(Transformation::scaling(0.5, 0.5, 0.5));
 
         let w = World::default();
@@ -251,8 +251,8 @@ mod tests {
     #[test]
     fn shade_hit_is_given_an_intersection_in_shadow() {
         let light = PointLight::new(Tuple::point(0., 0., -10.), Tuple::color(1., 1., 1.));
-        let s1 = Sphere::new();
-        let mut s2 = Sphere::new();
+        let s1 = Shape::sphere();
+        let mut s2 = Shape::sphere();
         s2.set_transform(Transformation::translation(0., 0., 10.));
         let w = World::with_objects_and_light(vec![s1, s2], light);
         let r = Ray::new(Tuple::point(0., 0., 5.), Tuple::vector(0., 0., 1.));

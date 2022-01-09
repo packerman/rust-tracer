@@ -1,15 +1,15 @@
 use crate::rays::Ray;
-use crate::spheres::Sphere;
+use crate::shapes::Shape;
 use crate::tuples::Point;
 use crate::tuples::Scalar;
 use crate::tuples::Vector;
 use std::cmp::Ordering;
 use std::ptr;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub struct Intersection<'a> {
     pub t: Scalar,
-    pub object: &'a Sphere,
+    pub object: &'a Shape,
 }
 
 impl PartialEq for Intersection<'_> {
@@ -19,7 +19,7 @@ impl PartialEq for Intersection<'_> {
 }
 
 impl Intersection<'_> {
-    pub fn new(t: Scalar, object: &Sphere) -> Intersection {
+    pub fn new(t: Scalar, object: &Shape) -> Intersection {
         Intersection { t, object }
     }
 }
@@ -41,7 +41,7 @@ pub fn hit<'a>(intersections: &'a [Intersection<'a>]) -> Option<&'a Intersection
 
 pub struct Computations<'a> {
     t: Scalar,
-    pub object: &'a Sphere,
+    pub object: &'a Shape,
     pub point: Point,
     pub eyev: Vector,
     pub normalv: Vector,
@@ -86,7 +86,7 @@ mod tests {
 
     #[test]
     fn creating_intersection() {
-        let s = Sphere::new();
+        let s = Shape::sphere();
         let i = Intersection::new(3.5, &s);
 
         assert_eq!(i.t, 3.5);
@@ -95,7 +95,7 @@ mod tests {
 
     #[test]
     fn aggregating_intersections() {
-        let s = Sphere::new();
+        let s = Shape::sphere();
         let i1 = Intersection::new(1., &s);
         let i2 = Intersection::new(2., &s);
 
@@ -108,7 +108,7 @@ mod tests {
 
     #[test]
     fn the_hit_when_all_intersections_have_positive_t() {
-        let s = Sphere::new();
+        let s = Shape::sphere();
         let i1 = Intersection::new(1., &s);
         let i2 = Intersection::new(2., &s);
         let xs = intersections(vec![i2, i1]);
@@ -120,7 +120,7 @@ mod tests {
 
     #[test]
     fn the_hit_when_some_intersections_have_negative_t() {
-        let s = Sphere::new();
+        let s = Shape::sphere();
         let i1 = Intersection::new(-1., &s);
         let i2 = Intersection::new(1., &s);
         let xs = intersections(vec![i2, i1]);
@@ -132,7 +132,7 @@ mod tests {
 
     #[test]
     fn the_hit_when_all_intersections_have_negative_t() {
-        let s = Sphere::new();
+        let s = Shape::sphere();
         let i1 = Intersection::new(-2., &s);
         let i2 = Intersection::new(-1., &s);
         let xs = intersections(vec![i2, i1]);
@@ -144,7 +144,7 @@ mod tests {
 
     #[test]
     fn the_hit_is_always_the_lowest_nonnegative_intersection() {
-        let s = Sphere::new();
+        let s = Shape::sphere();
         let i1 = Intersection::new(5., &s);
         let i2 = Intersection::new(7., &s);
         let i3 = Intersection::new(-3., &s);
@@ -159,7 +159,7 @@ mod tests {
     #[test]
     fn precomputing_the_state_of_an_intersection() {
         let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
-        let shape = Sphere::new();
+        let shape = Shape::sphere();
         let i = Intersection::new(4., &shape);
 
         let comps = Computations::prepare(&i, &r);
@@ -174,7 +174,7 @@ mod tests {
     #[test]
     fn the_hit_when_an_intersection_occurs_on_the_outside() {
         let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
-        let shape = Sphere::new();
+        let shape = Shape::sphere();
         let i = Intersection::new(4., &shape);
 
         let comps = Computations::prepare(&i, &r);
@@ -185,7 +185,7 @@ mod tests {
     #[test]
     fn the_hit_when_an_intersection_occurs_on_the_inside() {
         let r = Ray::new(Tuple::point(0., 0., 0.), Tuple::vector(0., 0., 1.));
-        let shape = Sphere::new();
+        let shape = Shape::sphere();
         let i = Intersection::new(1., &shape);
 
         let comps = Computations::prepare(&i, &r);
@@ -199,7 +199,7 @@ mod tests {
     #[test]
     fn the_shit_should_offset_the_point() {
         let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
-        let mut shape = Sphere::new();
+        let mut shape = Shape::sphere();
         shape.set_transform(Transformation::translation(0., 0., 1.));
         let i = Intersection::new(5., &shape);
 

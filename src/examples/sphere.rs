@@ -3,7 +3,7 @@ use lib::intersections::hit;
 use lib::lights::PointLight;
 use lib::materials::Material;
 use lib::rays::Ray;
-use lib::spheres::Sphere;
+use lib::shapes::Shape;
 use lib::tuples::Scalar;
 use lib::tuples::Tuple;
 use std::fs::File;
@@ -19,7 +19,7 @@ fn main() {
     let half = wall_size / 2.;
 
     let mut canvas = Canvas::new(canvas_pixels, canvas_pixels);
-    let mut shape = Sphere::new();
+    let mut shape = Shape::sphere();
 
     let mut material = Material::new();
     material.color = Tuple::color(1., 0.2, 1.);
