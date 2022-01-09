@@ -2,7 +2,6 @@ use lib::camera::Camera;
 use lib::lights::PointLight;
 use lib::materials::Material;
 use lib::shapes::Shape;
-use lib::spheres::Sphere;
 use lib::transformations::Transformation;
 use lib::tuples::Tuple;
 use lib::world::World;
