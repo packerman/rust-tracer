@@ -8,7 +8,6 @@ use crate::world::World;
 pub struct Camera {
     hsize: usize,
     vsize: usize,
-    field_of_view: Scalar,
     transform: Transformation,
     inversed_transform: Transformation,
     pixel_size: Scalar,
@@ -34,17 +33,12 @@ impl Camera {
         Camera {
             hsize,
             vsize,
-            field_of_view,
             transform: Transformation::IDENTITY,
             inversed_transform: Transformation::IDENTITY,
             pixel_size: (half_width * 2.) / (hsize as Scalar),
             half_width,
             half_height,
         }
-    }
-
-    fn transform(&self) -> &Transformation {
-        &self.transform
     }
 
     pub fn set_transform(&mut self, transform: Transformation) {
@@ -99,8 +93,7 @@ mod tests {
 
         assert_eq!(c.hsize, 160);
         assert_eq!(c.vsize, 120);
-        assert_eq!(c.field_of_view, FRAC_PI_2);
-        assert_eq!(c.transform(), &Transformation::IDENTITY);
+        assert_eq!(c.transform, Transformation::IDENTITY);
     }
 
     #[test]

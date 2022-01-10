@@ -1,31 +1,62 @@
 use crate::intersections::Intersection;
 use crate::materials::Material;
 use crate::rays::Ray;
-use crate::spheres::Sphere;
 use crate::transformations::Transformation;
 use crate::tuples::Point;
 use crate::tuples::Scalar;
+use crate::tuples::Tuple;
 use crate::tuples::Vector;
 
-pub trait ShapeType {
-    fn local_intersect(&self, ray: &Ray) -> Vec<Scalar>;
-
-    fn local_normal_at(&self, point: &Point) -> Vector;
+#[derive(PartialEq, Debug)]
+pub enum ShapeType {
+    Sphere,
 }
 
+impl ShapeType {
+    pub fn local_intersect(&self, ray: &Ray) -> Vec<Scalar> {
+        match self {
+            ShapeType::Sphere => {
+                let sphere_to_ray = ray.origin - Tuple::point(0., 0., 0.);
+
+                let a = ray.direction.dot(&ray.direction);
+                let b = 2. * ray.direction.dot(&sphere_to_ray);
+                let c = sphere_to_ray.dot(&sphere_to_ray) - 1.;
+
+                let discriminant = b * b - 4. * a * c;
+
+                if discriminant < 0. {
+                    vec![]
+                } else {
+                    let t1 = (-b - discriminant.sqrt()) / (2. * a);
+                    let t2 = (-b + discriminant.sqrt()) / (2. * a);
+
+                    vec![t1, t2]
+                }
+            }
+        }
+    }
+
+    pub fn local_normal_at(&self, point: &Point) -> Vector {
+        match self {
+            ShapeType::Sphere => *point - Tuple::point(0., 0., 0.),
+        }
+    }
+}
+
+#[derive(PartialEq, Debug)]
 pub struct Shape {
     transform: Transformation,
     inversed_transform: Transformation,
     pub material: Material,
-    shape_type: Box<dyn ShapeType>,
+    shape_type: ShapeType,
 }
 
 impl Shape {
     pub fn sphere() -> Shape {
-        Self::new(Box::new(Sphere))
+        Self::new(ShapeType::Sphere)
     }
 
-    fn new(shape_type: Box<dyn ShapeType>) -> Shape {
+    fn new(shape_type: ShapeType) -> Shape {
         Shape {
             transform: Transformation::IDENTITY,
             inversed_transform: Transformation::IDENTITY,
@@ -71,40 +102,16 @@ mod tests {
     use std::f64::consts::SQRT_2;
     use std::ptr;
 
-    struct TestShape;
-
-    impl ShapeType for TestShape {
-        fn local_intersect(&self, ray: &Ray) -> Vec<Scalar> {
-            let origin = ray.origin;
-            let direction = ray.direction;
-            vec![
-                origin.x,
-                origin.y,
-                origin.z,
-                direction.x,
-                direction.y,
-                direction.z,
-            ]
-        }
-        fn local_normal_at(&self, point: &Point) -> Vector {
-            Tuple::vector(point.x, point.y, point.z)
-        }
-    }
-
-    pub fn test_shape() -> Shape {
-        Shape::new(Box::new(TestShape))
-    }
-
     #[test]
     fn a_shape_default_transformation() {
-        let s = test_shape();
+        let s = Shape::sphere();
 
         assert_eq!(s.transform(), &Transformation::IDENTITY);
     }
 
     #[test]
     fn changing_a_shape_transformation() {
-        let mut s = test_shape();
+        let mut s = Shape::sphere();
         let t = Transformation::translation(2., 3., 4.);
 
         s.set_transform(t);
@@ -113,7 +120,7 @@ mod tests {
 
     #[test]
     fn a_shape_has_a_default_material() {
-        let s = test_shape();
+        let s = Shape::sphere();
 
         let m = s.material;
 
@@ -122,7 +129,7 @@ mod tests {
 
     #[test]
     fn a_sphere_may_be_assigned_a_material() {
-        let mut s = test_shape();
+        let mut s = Shape::sphere();
         let mut m = Material::new();
         m.ambient = 1.;
 
@@ -134,51 +141,43 @@ mod tests {
     #[test]
     fn intersect_sets_the_object_on_the_intersection() {
         let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
-        let s = test_shape();
+        let s = Shape::sphere();
 
         let xs = s.intersect(&r);
 
         assert!(xs.len() > 0);
         for x in xs.iter() {
-            assert!(ptr::eq(xs[0].object, &s));
+            assert!(ptr::eq(x.object, &s));
         }
     }
 
     #[test]
     fn intersecting_a_scaled_shape_with_a_ray() {
         let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
-        let mut s = test_shape();
+        let mut s = Shape::sphere();
 
         s.set_transform(Transformation::scaling(2., 2., 2.));
         let xs = s.intersect(&r);
 
-        let saved_ray = Ray::new(
-            Tuple::point(xs[0].t, xs[1].t, xs[2].t),
-            Tuple::vector(xs[3].t, xs[4].t, xs[5].t),
-        );
-        assert_eq!(saved_ray.origin, Tuple::point(0., 0., -2.5));
-        assert_eq!(saved_ray.direction, Tuple::vector(0., 0., 0.5));
+        assert_eq!(xs.len(), 2);
+        assert_eq!(xs[0].t, 3.);
+        assert_eq!(xs[1].t, 7.);
     }
 
     #[test]
     fn intersecting_a_translated_shape_with_a_ray() {
         let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
-        let mut s = test_shape();
+        let mut s = Shape::sphere();
 
         s.set_transform(Transformation::translation(5., 0., 0.));
         let xs = s.intersect(&r);
 
-        let saved_ray = Ray::new(
-            Tuple::point(xs[0].t, xs[1].t, xs[2].t),
-            Tuple::vector(xs[3].t, xs[4].t, xs[5].t),
-        );
-        assert_eq!(saved_ray.origin, Tuple::point(-5., 0., -5.));
-        assert_eq!(saved_ray.direction, Tuple::vector(0., 0., 1.));
+        assert_eq!(xs.len(), 0);
     }
 
     #[test]
     fn computing_normal_on_a_translated_shape() {
-        let mut s = test_shape();
+        let mut s = Shape::sphere();
         s.set_transform(Transformation::translation(0., 1., 0.));
 
         let n = s.normal_at(&Tuple::point(0., 1.70711, -0.70711));
@@ -188,12 +187,121 @@ mod tests {
 
     #[test]
     fn computing_normal_on_a_transformed_shape() {
-        let mut s = test_shape();
+        let mut s = Shape::sphere();
         let m = Transformation::scaling(1., 0.5, 1.) * Transformation::rotation_z(PI / 5.);
         s.set_transform(m);
 
         let n = s.normal_at(&Tuple::point(0., SQRT_2 / 2., -SQRT_2 / 2.));
 
         assert_abs_diff_eq!(n, Tuple::vector(0., 0.97014, -0.24254), epsilon = 0.00001);
+    }
+
+    mod spheres {
+
+        use super::*;
+
+        #[test]
+        fn ray_intersects_sphere_at_two_point() {
+            let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
+            let s = ShapeType::Sphere;
+            let xs = s.local_intersect(&r);
+            assert_eq!(xs.len(), 2);
+            assert_eq!(xs[0], 4.);
+            assert_eq!(xs[1], 6.);
+        }
+
+        #[test]
+        fn ray_intersects_sphere_at_tangent() {
+            let r = Ray::new(Tuple::point(0., 1., -5.), Tuple::vector(0., 0., 1.));
+            let s = ShapeType::Sphere;
+            let xs = s.local_intersect(&r);
+            assert_eq!(xs.len(), 2);
+            assert_eq!(xs[0], 5.);
+            assert_eq!(xs[1], 5.);
+        }
+
+        #[test]
+        fn ray_misses_a_sphere() {
+            let r = Ray::new(Tuple::point(0., 2., -5.), Tuple::vector(0., 0., 1.));
+            let s = ShapeType::Sphere;
+            let xs = s.local_intersect(&r);
+            assert_eq!(xs.len(), 0);
+        }
+
+        #[test]
+        fn ray_originates_inside_sphere() {
+            let r = Ray::new(Tuple::point(0., 0., 0.), Tuple::vector(0., 0., 1.));
+            let s = ShapeType::Sphere;
+            let xs = s.local_intersect(&r);
+            assert_eq!(xs.len(), 2);
+            assert_eq!(xs[0], -1.);
+            assert_eq!(xs[1], 1.);
+        }
+
+        #[test]
+        fn sphere_is_behind_a_ray() {
+            let r = Ray::new(Tuple::point(0., 0., 5.), Tuple::vector(0., 0., 1.));
+            let s = ShapeType::Sphere;
+            let xs = s.local_intersect(&r);
+            assert_eq!(xs.len(), 2);
+            assert_eq!(xs[0], -6.);
+            assert_eq!(xs[1], -4.);
+        }
+
+        #[test]
+        fn the_normal_on_a_sphere_at_a_point_on_the_x_axis() {
+            let s = ShapeType::Sphere;
+
+            let n = s.local_normal_at(&Tuple::point(1., 0., 0.));
+
+            assert_eq!(n, Tuple::vector(1., 0., 0.));
+        }
+
+        #[test]
+        fn the_normal_on_a_sphere_at_a_point_on_the_y_axis() {
+            let s = ShapeType::Sphere;
+
+            let n = s.local_normal_at(&Tuple::point(0., 1., 0.));
+
+            assert_eq!(n, Tuple::vector(0., 1., 0.));
+        }
+
+        #[test]
+        fn the_normal_on_a_sphere_at_a_point_on_the_z_axis() {
+            let s = ShapeType::Sphere;
+
+            let n = s.local_normal_at(&Tuple::point(0., 0., 1.));
+
+            assert_eq!(n, Tuple::vector(0., 0., 1.));
+        }
+
+        #[test]
+        fn the_normal_on_a_sphere_at_a_nonaxial_point() {
+            let s = ShapeType::Sphere;
+
+            let n = s.local_normal_at(&Tuple::point(
+                3_f64.sqrt() / 3.,
+                3_f64.sqrt() / 3.,
+                3_f64.sqrt() / 3.,
+            ));
+
+            assert_abs_diff_eq!(
+                n,
+                Tuple::vector(3_f64.sqrt() / 3., 3_f64.sqrt() / 3., 3_f64.sqrt() / 3.)
+            );
+        }
+
+        #[test]
+        fn the_normal_is_a_normalized_vector() {
+            let s = ShapeType::Sphere;
+
+            let n = s.local_normal_at(&Tuple::point(
+                3_f64.sqrt() / 3.,
+                3_f64.sqrt() / 3.,
+                3_f64.sqrt() / 3.,
+            ));
+
+            assert_abs_diff_eq!(n, n.normalize());
+        }
     }
 }

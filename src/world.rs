@@ -17,7 +17,7 @@ pub struct World {
 }
 
 impl World {
-    fn new() -> World {
+    pub fn new() -> World {
         World {
             objects: vec![],
             lights: vec![],
@@ -47,7 +47,7 @@ impl World {
         World::with_objects_and_light(vec![s1, s2], light)
     }
 
-    fn contains(&self, object: &Shape) -> bool {
+    pub fn contains(&self, object: &Shape) -> bool {
         self.objects.contains(object)
     }
 

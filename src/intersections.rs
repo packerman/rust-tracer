@@ -4,18 +4,11 @@ use crate::tuples::Point;
 use crate::tuples::Scalar;
 use crate::tuples::Vector;
 use std::cmp::Ordering;
-use std::ptr;
 
-#[derive(Copy, Clone)]
+#[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Intersection<'a> {
     pub t: Scalar,
     pub object: &'a Shape,
-}
-
-impl PartialEq for Intersection<'_> {
-    fn eq(&self, other: &Intersection<'_>) -> bool {
-        self.t == other.t && ptr::eq(self.object, other.object)
-    }
 }
 
 impl Intersection<'_> {
