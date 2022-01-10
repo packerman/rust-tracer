@@ -10,6 +10,7 @@ use crate::tuples::Vector;
 #[derive(PartialEq, Debug)]
 pub enum ShapeType {
     Sphere,
+    Plane,
 }
 
 impl ShapeType {
@@ -33,12 +34,20 @@ impl ShapeType {
                     vec![t1, t2]
                 }
             }
+            ShapeType::Plane => {
+                if ray.direction.y.abs() < f64::EPSILON {
+                    vec![]
+                } else {
+                    vec![-ray.origin.y / ray.direction.y]
+                }
+            }
         }
     }
 
     pub fn local_normal_at(&self, point: &Point) -> Vector {
         match self {
             ShapeType::Sphere => *point - Tuple::point(0., 0., 0.),
+            ShapeType::Plane => Tuple::vector(0., 1., 0.),
         }
     }
 }
@@ -54,6 +63,10 @@ pub struct Shape {
 impl Shape {
     pub fn sphere() -> Shape {
         Self::new(ShapeType::Sphere)
+    }
+
+    pub fn plane() -> Shape {
+        Self::new(ShapeType::Plane)
     }
 
     fn new(shape_type: ShapeType) -> Shape {
@@ -302,6 +315,66 @@ mod tests {
             ));
 
             assert_abs_diff_eq!(n, n.normalize());
+        }
+    }
+
+    mod planes {
+
+        use super::*;
+
+        #[test]
+        fn the_normal_of_a_plane_is_constant_everywhere() {
+            let p = ShapeType::Plane;
+
+            let n1 = p.local_normal_at(&Tuple::point(0., 0., 0.));
+            let n2 = p.local_normal_at(&Tuple::point(10., 0., -10.));
+            let n3 = p.local_normal_at(&Tuple::point(-5., 0., 150.));
+
+            assert_eq!(n1, Tuple::vector(0., 1., 0.));
+            assert_eq!(n2, Tuple::vector(0., 1., 0.));
+            assert_eq!(n3, Tuple::vector(0., 1., 0.));
+        }
+
+        #[test]
+        fn intersect_with_a_ray_parallel_to_the_plane() {
+            let p = ShapeType::Plane;
+            let r = Ray::new(Tuple::point(0., 10., 0.), Tuple::vector(0., 0., 1.));
+
+            let xs = p.local_intersect(&r);
+
+            assert!(xs.is_empty());
+        }
+
+        #[test]
+        fn intersect_with_a_coplanar_ray() {
+            let p = ShapeType::Plane;
+            let r = Ray::new(Tuple::point(0., 0., 0.), Tuple::vector(0., 0., 1.));
+
+            let xs = p.local_intersect(&r);
+
+            assert!(xs.is_empty());
+        }
+
+        #[test]
+        fn a_ray_intersecting_with_a_plane_from_above() {
+            let p = ShapeType::Plane;
+            let r = Ray::new(Tuple::point(0., 1., 0.), Tuple::vector(0., -1., 0.));
+
+            let xs = p.local_intersect(&r);
+
+            assert_eq!(xs.len(), 1);
+            assert_eq!(xs[0], 1.);
+        }
+
+        #[test]
+        fn a_ray_intersecting_with_a_plane_from_below() {
+            let p = ShapeType::Plane;
+            let r = Ray::new(Tuple::point(0., -1., 0.), Tuple::vector(0., 1., 0.));
+
+            let xs = p.local_intersect(&r);
+
+            assert_eq!(xs.len(), 1);
+            assert_eq!(xs[0], 1.);
         }
     }
 }
