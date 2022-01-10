@@ -1,7 +1,7 @@
 use lib::canvas::Canvas;
 use lib::intersections::hit;
 use lib::rays::Ray;
-use lib::spheres::Sphere;
+use lib::shapes::Shape;
 use lib::tuples::Scalar;
 use lib::tuples::Tuple;
 use std::fs::File;
@@ -18,7 +18,7 @@ fn main() {
 
     let mut canvas = Canvas::new(canvas_pixels, canvas_pixels);
     let color = Tuple::color(1., 0., 0.);
-    let shape = Sphere::new();
+    let shape = Shape::sphere();
 
     for y in 0..canvas_pixels {
         let world_y = half - pixel_size * (y as Scalar);
