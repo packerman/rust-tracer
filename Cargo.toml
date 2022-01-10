@@ -37,3 +37,7 @@ path = "src/examples/scene.rs"
 [[bin]]
 name = "shadows"
 path = "src/examples/shadows.rs"
+
+[[bin]]
+name = "plane"
+path = "src/examples/plane.rs"
