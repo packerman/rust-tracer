@@ -1,4 +1,5 @@
 use crate::lights::PointLight;
+use crate::patterns::StripePattern;
 use crate::tuples::Color;
 use crate::tuples::Point;
 use crate::tuples::Scalar;
@@ -8,6 +9,7 @@ use crate::tuples::Vector;
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Material {
     pub color: Color,
+    pub pattern: Option<StripePattern>,
     pub ambient: Scalar,
     pub diffuse: Scalar,
     pub specular: Scalar,
@@ -18,6 +20,7 @@ impl Material {
     pub const fn new() -> Material {
         Material {
             color: Tuple::color(1., 1., 1.),
+            pattern: None,
             ambient: 0.1,
             diffuse: 0.9,
             specular: 0.9,
@@ -33,7 +36,10 @@ impl Material {
         normalv: &Vector,
         in_shadow: bool,
     ) -> Color {
-        let effective_color = self.color * light.intensity;
+        let color = self
+            .pattern
+            .map_or(self.color, |pattern| pattern.stripe_at(point));
+        let effective_color = color * light.intensity;
         let lightv = (light.position - *point).normalize();
         let ambient = effective_color * self.ambient;
         let light_dot_normal = lightv.dot(normalv);
@@ -153,6 +159,27 @@ mod tests {
 
             let result = M.lighting(&light, &POSITION, &eyev, &normalv, in_shadow);
             assert_eq!(result, Tuple::color(0.1, 0.1, 0.1));
+        }
+
+        #[test]
+        fn lighting_with_a_pattern_applied() {
+            let mut m = Material::new();
+            m.pattern = Some(StripePattern::new(
+                Tuple::color(1., 1., 1.),
+                Tuple::color(0., 0., 0.),
+            ));
+            m.ambient = 1.;
+            m.diffuse = 0.;
+            m.specular = 0.;
+            let eyev = Tuple::vector(0., 0., -1.);
+            let normalv = Tuple::vector(0., 0., -1.);
+            let light = PointLight::new(Tuple::point(0., 0., -10.), Tuple::color(1., 1., 1.));
+
+            let c1 = m.lighting(&light, &Tuple::point(0.9, 0., 0.), &eyev, &normalv, false);
+            let c2 = m.lighting(&light, &Tuple::point(1.1, 0., 0.), &eyev, &normalv, false);
+
+            assert_eq!(c1, Tuple::color(1., 1., 1.));
+            assert_eq!(c2, Tuple::color(0., 0., 0.));
         }
     }
 }
