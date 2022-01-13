@@ -65,6 +65,7 @@ impl World {
             .map(|light| {
                 let shadowed = self.is_shadowed(&comps.over_point, light);
                 comps.object.material.lighting(
+                    comps.object,
                     light,
                     &comps.over_point,
                     &comps.eyev,

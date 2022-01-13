@@ -82,6 +82,10 @@ impl Shape {
         &self.transform
     }
 
+    pub fn inversed_transform(&self) -> &Transformation {
+        &self.inversed_transform
+    }
+
     pub fn set_transform(&mut self, transform: Transformation) {
         self.transform = transform;
         self.inversed_transform = transform.inverse();

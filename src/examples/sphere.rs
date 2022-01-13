@@ -42,7 +42,7 @@ fn main() {
                 let color = hit
                     .object
                     .material
-                    .lighting(&light, &point, &eye, &normal, false);
+                    .lighting(&shape, &light, &point, &eye, &normal, false);
                 canvas.write_pixel(x, y, color);
             }
         }

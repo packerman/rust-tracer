@@ -1,5 +1,6 @@
 use crate::lights::PointLight;
 use crate::patterns::StripePattern;
+use crate::shapes::Shape;
 use crate::tuples::Color;
 use crate::tuples::Point;
 use crate::tuples::Scalar;
@@ -30,15 +31,16 @@ impl Material {
 
     pub fn lighting(
         &self,
+        object: &Shape,
         light: &PointLight,
         point: &Point,
         eyev: &Vector,
         normalv: &Vector,
         in_shadow: bool,
     ) -> Color {
-        let color = self
-            .pattern
-            .map_or(self.color, |pattern| pattern.stripe_at(point));
+        let color = self.pattern.map_or(self.color, |pattern| {
+            pattern.stripe_at_object(object, point)
+        });
         let effective_color = color * light.intensity;
         let lightv = (light.position - *point).normalize();
         let ambient = effective_color * self.ambient;
@@ -98,7 +100,7 @@ mod tests {
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 0., -10.), Tuple::color(1., 1., 1.));
 
-            let result = M.lighting(&light, &POSITION, &eyev, &normalv, false);
+            let result = M.lighting(&Shape::sphere(), &light, &POSITION, &eyev, &normalv, false);
             assert_eq!(result, Tuple::color(1.9, 1.9, 1.9));
         }
 
@@ -108,7 +110,7 @@ mod tests {
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 0., -10.), Tuple::color(1., 1., 1.));
 
-            let result = M.lighting(&light, &POSITION, &eyev, &normalv, false);
+            let result = M.lighting(&Shape::sphere(), &light, &POSITION, &eyev, &normalv, false);
             assert_eq!(result, Tuple::color(1., 1., 1.));
         }
 
@@ -118,7 +120,7 @@ mod tests {
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 10., -10.), Tuple::color(1., 1., 1.));
 
-            let result = M.lighting(&light, &POSITION, &eyev, &normalv, false);
+            let result = M.lighting(&Shape::sphere(), &light, &POSITION, &eyev, &normalv, false);
             assert_abs_diff_eq!(
                 result,
                 Tuple::color(0.7364, 0.7364, 0.7364),
@@ -132,7 +134,7 @@ mod tests {
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 10., -10.), Tuple::color(1., 1., 1.));
 
-            let result = M.lighting(&light, &POSITION, &eyev, &normalv, false);
+            let result = M.lighting(&Shape::sphere(), &light, &POSITION, &eyev, &normalv, false);
             assert_abs_diff_eq!(
                 result,
                 Tuple::color(1.6364, 1.6364, 1.6364),
@@ -146,7 +148,7 @@ mod tests {
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 0., 10.), Tuple::color(1., 1., 1.));
 
-            let result = M.lighting(&light, &POSITION, &eyev, &normalv, false);
+            let result = M.lighting(&Shape::sphere(), &light, &POSITION, &eyev, &normalv, false);
             assert_eq!(result, Tuple::color(0.1, 0.1, 0.1));
         }
 
@@ -157,7 +159,14 @@ mod tests {
             let light = PointLight::new(Tuple::point(0., 0., -10.), Tuple::color(1., 1., 1.));
             let in_shadow = true;
 
-            let result = M.lighting(&light, &POSITION, &eyev, &normalv, in_shadow);
+            let result = M.lighting(
+                &Shape::sphere(),
+                &light,
+                &POSITION,
+                &eyev,
+                &normalv,
+                in_shadow,
+            );
             assert_eq!(result, Tuple::color(0.1, 0.1, 0.1));
         }
 
@@ -175,8 +184,22 @@ mod tests {
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 0., -10.), Tuple::color(1., 1., 1.));
 
-            let c1 = m.lighting(&light, &Tuple::point(0.9, 0., 0.), &eyev, &normalv, false);
-            let c2 = m.lighting(&light, &Tuple::point(1.1, 0., 0.), &eyev, &normalv, false);
+            let c1 = m.lighting(
+                &Shape::sphere(),
+                &light,
+                &Tuple::point(0.9, 0., 0.),
+                &eyev,
+                &normalv,
+                false,
+            );
+            let c2 = m.lighting(
+                &Shape::sphere(),
+                &light,
+                &Tuple::point(1.1, 0., 0.),
+                &eyev,
+                &normalv,
+                false,
+            );
 
             assert_eq!(c1, Tuple::color(1., 1., 1.));
             assert_eq!(c2, Tuple::color(0., 0., 0.));
