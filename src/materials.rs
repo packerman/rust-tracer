@@ -1,5 +1,5 @@
 use crate::lights::PointLight;
-use crate::patterns::StripePattern;
+use crate::patterns::Pattern;
 use crate::shapes::Shape;
 use crate::tuples::Color;
 use crate::tuples::Point;
@@ -10,7 +10,7 @@ use crate::tuples::Vector;
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Material {
     pub color: Color,
-    pub pattern: Option<StripePattern>,
+    pub pattern: Option<Pattern>,
     pub ambient: Scalar,
     pub diffuse: Scalar,
     pub specular: Scalar,
@@ -39,7 +39,7 @@ impl Material {
         in_shadow: bool,
     ) -> Color {
         let color = self.pattern.map_or(self.color, |pattern| {
-            pattern.stripe_at_object(object, point)
+            pattern.pattern_at_shape(object, point)
         });
         let effective_color = color * light.intensity;
         let lightv = (light.position - *point).normalize();
@@ -173,7 +173,7 @@ mod tests {
         #[test]
         fn lighting_with_a_pattern_applied() {
             let mut m = Material::new();
-            m.pattern = Some(StripePattern::new(
+            m.pattern = Some(Pattern::stripe(
                 Tuple::color(1., 1., 1.),
                 Tuple::color(0., 0., 0.),
             ));
