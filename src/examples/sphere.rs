@@ -22,7 +22,7 @@ fn main() {
     let mut shape = Shape::sphere();
 
     let mut material = Material::new();
-    material.color = Tuple::color(1., 0.2, 1.);
+    material.set_color(Tuple::color(1., 0.2, 1.));
     shape.material = material;
 
     let light = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
@@ -42,7 +42,7 @@ fn main() {
                 let color = hit
                     .object
                     .material
-                    .lighting(&light, &point, &eye, &normal, false);
+                    .lighting(&shape, &light, &point, &eye, &normal, false);
                 canvas.write_pixel(x, y, color);
             }
         }

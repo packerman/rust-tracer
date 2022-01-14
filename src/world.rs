@@ -36,7 +36,7 @@ impl World {
 
         let mut s1 = Shape::sphere();
         let mut m1 = Material::new();
-        m1.color = Tuple::color(0.8, 1., 0.6);
+        m1.set_color(Tuple::color(0.8, 1., 0.6));
         m1.diffuse = 0.7;
         m1.specular = 0.2;
         s1.material = m1;
@@ -65,6 +65,7 @@ impl World {
             .map(|light| {
                 let shadowed = self.is_shadowed(&comps.over_point, light);
                 comps.object.material.lighting(
+                    comps.object,
                     light,
                     &comps.over_point,
                     &comps.eyev,
@@ -122,7 +123,7 @@ mod tests {
         let light = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
         let mut s1 = Shape::sphere();
         let mut m1 = Material::new();
-        m1.color = Tuple::color(0.8, 1., 0.6);
+        m1.set_color(Tuple::color(0.8, 1., 0.6));
         m1.diffuse = 0.7;
         m1.specular = 0.2;
         s1.material = m1;
@@ -209,7 +210,10 @@ mod tests {
         outer.material.ambient = 1.;
         let inner = &mut w.objects[1];
         inner.material.ambient = 1.;
-        let inner_color = inner.material.color;
+        let inner_color = inner
+            .material
+            .pattern
+            .pattern_at_shape(&inner, &Tuple::point(0., 0., 0.));
         let r = Ray::new(Tuple::point(0., 0., 0.75), Tuple::vector(0., 0., -1.));
 
         let c = w.color_at(&r);

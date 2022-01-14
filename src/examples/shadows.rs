@@ -25,28 +25,28 @@ fn main() {
     sphere_material.shininess = 200.;
 
     let mut wrist_material = sphere_material.clone();
-    wrist_material.color = Tuple::color(0.1, 1., 1.);
+    wrist_material.set_color(Tuple::color(0.1, 1., 1.));
 
     let mut palm_material = sphere_material.clone();
-    palm_material.color = Tuple::color(0.1, 0.1, 1.);
+    palm_material.set_color(Tuple::color(0.1, 0.1, 1.));
 
     let mut thumb_material = sphere_material.clone();
-    thumb_material.color = Tuple::color(0.1, 0.1, 1.);
+    thumb_material.set_color(Tuple::color(0.1, 0.1, 1.));
 
     let mut index_material = sphere_material.clone();
-    index_material.color = Tuple::color(1., 1., 0.1);
+    index_material.set_color(Tuple::color(1., 1., 0.1));
 
     let mut middle_material = sphere_material.clone();
-    middle_material.color = Tuple::color(0.1, 1., 0.5);
+    middle_material.set_color(Tuple::color(0.1, 1., 0.5));
 
     let mut ring_material = sphere_material.clone();
-    ring_material.color = Tuple::color(0.1, 1., 0.1);
+    ring_material.set_color(Tuple::color(0.1, 1., 0.1));
 
     let mut pinky_material = sphere_material.clone();
-    pinky_material.color = Tuple::color(0.1, 0.5, 1.);
+    pinky_material.set_color(Tuple::color(0.1, 0.5, 1.));
 
     let mut backdrop = Shape::sphere();
-    backdrop.material.color = Tuple::color(1., 1., 1.);
+    backdrop.material.set_color(Tuple::color(1., 1., 1.));
     backdrop.material.ambient = 0.;
     backdrop.material.diffuse = 0.5;
     backdrop.material.specular = 0.;
