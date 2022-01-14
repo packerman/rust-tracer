@@ -9,8 +9,7 @@ use crate::tuples::Vector;
 
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Material {
-    pub color: Color,
-    pub pattern: Option<Pattern>,
+    pub pattern: Pattern,
     pub ambient: Scalar,
     pub diffuse: Scalar,
     pub specular: Scalar,
@@ -20,13 +19,16 @@ pub struct Material {
 impl Material {
     pub const fn new() -> Material {
         Material {
-            color: Tuple::color(1., 1., 1.),
-            pattern: None,
+            pattern: Pattern::solid(Tuple::color(1., 1., 1.)),
             ambient: 0.1,
             diffuse: 0.9,
             specular: 0.9,
             shininess: 200.,
         }
+    }
+
+    pub fn set_color(&mut self, color: Color) {
+        self.pattern = Pattern::solid(color);
     }
 
     pub fn lighting(
@@ -38,9 +40,7 @@ impl Material {
         normalv: &Vector,
         in_shadow: bool,
     ) -> Color {
-        let color = self.pattern.map_or(self.color, |pattern| {
-            pattern.pattern_at_shape(object, point)
-        });
+        let color = self.pattern.pattern_at_shape(object, point);
         let effective_color = color * light.intensity;
         let lightv = (light.position - *point).normalize();
         let ambient = effective_color * self.ambient;
@@ -75,7 +75,7 @@ mod tests {
     #[test]
     fn default_material() {
         let m = Material::new();
-        assert_eq!(m.color, Tuple::color(1., 1., 1.));
+        assert_eq!(m.pattern, Pattern::solid(Tuple::color(1., 1., 1.)));
         assert_eq!(m.ambient, 0.1);
         assert_eq!(m.diffuse, 0.9);
         assert_eq!(m.specular, 0.9);
@@ -173,10 +173,7 @@ mod tests {
         #[test]
         fn lighting_with_a_pattern_applied() {
             let mut m = Material::new();
-            m.pattern = Some(Pattern::stripe(
-                Tuple::color(1., 1., 1.),
-                Tuple::color(0., 0., 0.),
-            ));
+            m.pattern = Pattern::stripe(Tuple::color(1., 1., 1.), Tuple::color(0., 0., 0.));
             m.ambient = 1.;
             m.diffuse = 0.;
             m.specular = 0.;

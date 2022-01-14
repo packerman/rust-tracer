@@ -50,7 +50,7 @@ pub struct Pattern {
 }
 
 impl Pattern {
-    pub fn solid(a: Color) -> Pattern {
+    pub const fn solid(a: Color) -> Pattern {
         Self::new(PatternType::Solid { a })
     }
 
@@ -70,7 +70,7 @@ impl Pattern {
         Self::new(PatternType::Checker { a, b })
     }
 
-    pub fn new(pattern_type: PatternType) -> Pattern {
+    pub const fn new(pattern_type: PatternType) -> Pattern {
         Pattern {
             transform: Transformation::IDENTITY,
             invered_transform: Transformation::IDENTITY,
