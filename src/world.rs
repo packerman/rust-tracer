@@ -21,7 +21,7 @@ impl World {
         }
     }
 
-    pub fn with_objects_and_light<'a>(objects: Vec<Shape>, light: PointLight) -> World {
+    pub fn with_objects_and_light(objects: Vec<Shape>, light: PointLight) -> World {
         World {
             objects,
             lights: vec![light],

@@ -51,7 +51,7 @@ impl PpmFormatter {
         Ok(())
     }
 
-    fn to_string(&mut self) -> Result<String> {
+    fn get_output(mut self) -> Result<String> {
         self.flush()?;
         Ok(self.output.clone())
     }
@@ -108,7 +108,7 @@ impl Canvas {
             }
             formatter.new_line()?;
         }
-        let result = formatter.to_string()?;
+        let result = formatter.get_output()?;
         Ok(result)
     }
 

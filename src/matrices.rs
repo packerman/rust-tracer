@@ -6,6 +6,7 @@ use std::ops::{Index, Mul};
 pub struct Matrix4([[Scalar; 4]; 4]);
 
 impl Matrix4 {
+    #[allow(clippy::too_many_arguments)]
     pub const fn new(
         m00: Scalar,
         m01: Scalar,
@@ -25,11 +26,11 @@ impl Matrix4 {
         m33: Scalar,
     ) -> Matrix4 {
         Matrix4([
-                [m00, m01, m02, m03],
-                [m10, m11, m12, m13],
-                [m20, m21, m22, m23],
-                [m30, m31, m32, m33],
-            ])
+            [m00, m01, m02, m03],
+            [m10, m11, m12, m13],
+            [m20, m21, m22, m23],
+            [m30, m31, m32, m33],
+        ])
     }
 
     pub const IDENTITY: Matrix4 = Matrix4::new(
@@ -38,9 +39,9 @@ impl Matrix4 {
 
     pub fn transpose(&self) -> Matrix4 {
         let mut result = [[0.0; 4]; 4];
-        for i in 0..4 {
-            for j in 0..4 {
-                result[i][j] = self.0[j][i];
+        for (i, row) in result.iter_mut().enumerate() {
+            for (j, item) in row.iter_mut().enumerate() {
+                *item = self.0[j][i];
             }
         }
         Matrix4(result)
@@ -48,9 +49,9 @@ impl Matrix4 {
 
     fn sub_matrix(&self, l: usize, k: usize) -> Matrix3 {
         let mut result = [[0.0; 3]; 3];
-        for i in 0..3 {
-            for j in 0..3 {
-                result[i][j] = self.0[if i < l { i } else { i + 1 }][if j < k { j } else { j + 1 }]
+        for (i, row) in result.iter_mut().enumerate() {
+            for (j, item) in row.iter_mut().enumerate() {
+                *item = self.0[if i < l { i } else { i + 1 }][if j < k { j } else { j + 1 }]
             }
         }
         Matrix3(result)
@@ -78,9 +79,9 @@ impl Matrix4 {
     pub fn inverse(&self) -> Matrix4 {
         let det = self.determinant();
         let mut result = [[0.; 4]; 4];
-        for i in 0..4 {
-            for j in 0..4 {
-                result[j][i] = self.cofactor(i, j) / det;
+        for (i, row) in result.iter_mut().enumerate() {
+            for (j, item) in row.iter_mut().enumerate() {
+                *item = self.cofactor(i, j) / det;
             }
         }
         Matrix4(result)
@@ -100,9 +101,9 @@ impl Mul<Matrix4> for Matrix4 {
 
     fn mul(self, other: Matrix4) -> Self::Output {
         let mut result = [[0.0; 4]; 4];
-        for i in 0..4 {
-            for j in 0..4 {
-                result[i][j] = self.0[i][0] * other.0[0][j]
+        for (i, row) in result.iter_mut().enumerate() {
+            for (j, item) in row.iter_mut().enumerate() {
+                *item = self.0[i][0] * other.0[0][j]
                     + self.0[i][1] * other.0[1][j]
                     + self.0[i][2] * other.0[2][j]
                     + self.0[i][3] * other.0[3][j];
@@ -181,6 +182,7 @@ impl Index<(usize, usize)> for Matrix2 {
 pub struct Matrix3([[Scalar; 3]; 3]);
 
 impl Matrix3 {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         m00: Scalar,
         m01: Scalar,
@@ -197,9 +199,9 @@ impl Matrix3 {
 
     fn sub_matrix(&self, l: usize, k: usize) -> Matrix2 {
         let mut result = [[0.0; 2]; 2];
-        for i in 0..2 {
-            for j in 0..2 {
-                result[i][j] = self.0[if i < l { i } else { i + 1 }][if j < k { j } else { j + 1 }]
+        for (i, row) in result.iter_mut().enumerate() {
+            for (j, item) in row.iter_mut().enumerate() {
+                *item = self.0[if i < l { i } else { i + 1 }][if j < k { j } else { j + 1 }]
             }
         }
         Matrix2(result)

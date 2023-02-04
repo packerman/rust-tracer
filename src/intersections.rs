@@ -29,7 +29,7 @@ impl PartialOrd for Intersection<'_> {
     }
 }
 
-pub fn intersections<'a>(mut instersections: Vec<Intersection>) -> Vec<Intersection> {
+pub fn intersections(mut instersections: Vec<Intersection>) -> Vec<Intersection> {
     instersections.sort_by(|a, b| a.partial_cmp(b).unwrap());
     instersections
 }
