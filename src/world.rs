@@ -46,7 +46,7 @@ impl World {
             .iter()
             .map(|light| {
                 let shadowed = self.is_shadowed(&comps.over_point, light);
-                comps.object.material.lighting(
+                comps.object.material().lighting(
                     comps.object,
                     light,
                     &comps.over_point,
@@ -89,11 +89,11 @@ impl Default for World {
         let light = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
 
         let mut s1 = Shape::sphere();
-        let mut m1 = Material::new();
+        let mut m1 = Material::default();
         m1.set_color(Tuple::color(0.8, 1., 0.6));
         m1.diffuse = 0.7;
         m1.specular = 0.2;
-        s1.material = m1;
+        *s1.material_mut() = m1;
 
         let mut s2 = Shape::sphere();
         s2.set_transform(Transformation::scaling(0.5, 0.5, 0.5));
@@ -208,11 +208,11 @@ mod tests {
     fn the_color_with_an_intersection_behind_the_ray() {
         let mut w = World::default();
         let outer = &mut w.objects[0];
-        outer.material.ambient = 1.;
+        outer.material_mut().ambient = 1.;
         let inner = &mut w.objects[1];
-        inner.material.ambient = 1.;
+        inner.material_mut().ambient = 1.;
         let inner_color = inner
-            .material
+            .material()
             .pattern
             .pattern_at_shape(&inner, &Tuple::point(0., 0., 0.));
         let r = Ray::new(Tuple::point(0., 0., 0.75), Tuple::vector(0., 0., -1.));

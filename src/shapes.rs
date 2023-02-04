@@ -21,18 +21,9 @@ pub trait ShapeType: Debug {
 pub struct Shape {
     transform: Transformation,
     inversed_transform: Transformation,
-    pub material: Material,
+    material: Material,
     shape_type: Box<dyn ShapeType>,
 }
-
-// TODO
-// impl PartialEq for Shape {
-//     fn eq(&self, other: &Self) -> bool {
-//         self.transform == other.transform
-//             && self.material == other.material
-//             && Rc::ptr_eq(&self.shape_type, &other.shape_type)
-//     }
-// }
 
 impl Shape {
     pub fn sphere() -> Shape {
@@ -47,7 +38,7 @@ impl Shape {
         Shape {
             transform: Transformation::IDENTITY,
             inversed_transform: Transformation::IDENTITY,
-            material: Material::new(),
+            material: Material::default(),
             shape_type,
         }
     }
@@ -63,6 +54,14 @@ impl Shape {
     pub fn set_transform(&mut self, transform: Transformation) {
         self.transform = transform;
         self.inversed_transform = transform.inverse();
+    }
+
+    pub fn material(&self) -> &Material {
+        &self.material
+    }
+
+    pub fn material_mut(&mut self) -> &mut Material {
+        &mut self.material
     }
 
     pub fn intersect(&self, ray: &Ray) -> Vec<Intersection> {
@@ -116,18 +115,18 @@ mod tests {
 
         let m = s.material;
 
-        assert_eq!(m, Material::new());
+        assert_eq!(m.diffuse, Material::default().diffuse);
     }
 
     #[test]
     fn a_sphere_may_be_assigned_a_material() {
         let mut s = Shape::sphere();
-        let mut m = Material::new();
+        let mut m = Material::default();
         m.ambient = 1.;
 
         s.material = m;
 
-        assert_eq!(s.material, m);
+        assert_eq!(s.material.ambient, 1.);
     }
 
     #[test]

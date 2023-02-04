@@ -5,7 +5,7 @@ use crate::{
     tuples::{Color, Point, Scalar, Tuple, Vector},
 };
 
-#[derive(PartialEq, Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 pub struct Material {
     pub pattern: Pattern,
     pub ambient: Scalar,
@@ -15,16 +15,6 @@ pub struct Material {
 }
 
 impl Material {
-    pub const fn new() -> Material {
-        Material {
-            pattern: Pattern::solid(Tuple::color(1., 1., 1.)),
-            ambient: 0.1,
-            diffuse: 0.9,
-            specular: 0.9,
-            shininess: 200.,
-        }
-    }
-
     pub fn set_color(&mut self, color: Color) {
         self.pattern = Pattern::solid(color);
     }
@@ -65,6 +55,18 @@ impl Material {
     }
 }
 
+impl Default for Material {
+    fn default() -> Self {
+        Self {
+            pattern: Pattern::solid(Tuple::color(1., 1., 1.)),
+            ambient: 0.1,
+            diffuse: 0.9,
+            specular: 0.9,
+            shininess: 200.,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -72,8 +74,12 @@ mod tests {
 
     #[test]
     fn default_material() {
-        let m = Material::new();
-        assert_eq!(m.pattern, Pattern::solid(Tuple::color(1., 1., 1.)));
+        let m = Material::default();
+        assert_eq!(
+            m.pattern
+                .pattern_at_shape(&Shape::sphere(), &Tuple::point(0., 0., 0.)),
+            Tuple::color(1., 1., 1.)
+        );
         assert_eq!(m.ambient, 0.1);
         assert_eq!(m.diffuse, 0.9);
         assert_eq!(m.specular, 0.9);
@@ -90,7 +96,6 @@ mod tests {
         use approx::assert_abs_diff_eq;
         use std::f64::consts::*;
 
-        const M: Material = Material::new();
         const POSITION: Point = Tuple::point(0., 0., 0.);
 
         #[test]
@@ -99,7 +104,14 @@ mod tests {
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 0., -10.), Tuple::color(1., 1., 1.));
 
-            let result = M.lighting(&Shape::sphere(), &light, &POSITION, &eyev, &normalv, false);
+            let result = Material::default().lighting(
+                &Shape::sphere(),
+                &light,
+                &POSITION,
+                &eyev,
+                &normalv,
+                false,
+            );
             assert_eq!(result, Tuple::color(1.9, 1.9, 1.9));
         }
 
@@ -109,7 +121,14 @@ mod tests {
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 0., -10.), Tuple::color(1., 1., 1.));
 
-            let result = M.lighting(&Shape::sphere(), &light, &POSITION, &eyev, &normalv, false);
+            let result = Material::default().lighting(
+                &Shape::sphere(),
+                &light,
+                &POSITION,
+                &eyev,
+                &normalv,
+                false,
+            );
             assert_eq!(result, Tuple::color(1., 1., 1.));
         }
 
@@ -119,7 +138,14 @@ mod tests {
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 10., -10.), Tuple::color(1., 1., 1.));
 
-            let result = M.lighting(&Shape::sphere(), &light, &POSITION, &eyev, &normalv, false);
+            let result = Material::default().lighting(
+                &Shape::sphere(),
+                &light,
+                &POSITION,
+                &eyev,
+                &normalv,
+                false,
+            );
             assert_abs_diff_eq!(
                 result,
                 Tuple::color(0.7364, 0.7364, 0.7364),
@@ -133,7 +159,14 @@ mod tests {
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 10., -10.), Tuple::color(1., 1., 1.));
 
-            let result = M.lighting(&Shape::sphere(), &light, &POSITION, &eyev, &normalv, false);
+            let result = Material::default().lighting(
+                &Shape::sphere(),
+                &light,
+                &POSITION,
+                &eyev,
+                &normalv,
+                false,
+            );
             assert_abs_diff_eq!(
                 result,
                 Tuple::color(1.6364, 1.6364, 1.6364),
@@ -147,7 +180,14 @@ mod tests {
             let normalv = Tuple::vector(0., 0., -1.);
             let light = PointLight::new(Tuple::point(0., 0., 10.), Tuple::color(1., 1., 1.));
 
-            let result = M.lighting(&Shape::sphere(), &light, &POSITION, &eyev, &normalv, false);
+            let result = Material::default().lighting(
+                &Shape::sphere(),
+                &light,
+                &POSITION,
+                &eyev,
+                &normalv,
+                false,
+            );
             assert_eq!(result, Tuple::color(0.1, 0.1, 0.1));
         }
 
@@ -158,7 +198,7 @@ mod tests {
             let light = PointLight::new(Tuple::point(0., 0., -10.), Tuple::color(1., 1., 1.));
             let in_shadow = true;
 
-            let result = M.lighting(
+            let result = Material::default().lighting(
                 &Shape::sphere(),
                 &light,
                 &POSITION,
@@ -171,7 +211,7 @@ mod tests {
 
         #[test]
         fn lighting_with_a_pattern_applied() {
-            let mut m = Material::new();
+            let mut m = Material::default();
             m.pattern = Pattern::stripe(Tuple::color(1., 1., 1.), Tuple::color(0., 0., 0.));
             m.ambient = 1.;
             m.diffuse = 0.;

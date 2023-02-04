@@ -1,77 +1,115 @@
+use std::{fmt::Debug, rc::Rc};
+
 use crate::{
     shapes::Shape,
     transformations::Transformation,
     tuples::{Color, Point},
 };
 
-#[derive(PartialEq, Debug, Copy, Clone)]
-pub enum PatternType {
-    Solid { a: Color },
-    Stripe { a: Color, b: Color },
-    Gradient { a: Color, b: Color },
-    Ring { a: Color, b: Color },
-    Checker { a: Color, b: Color },
+pub trait PatternType: Debug {
+    fn pattern_at(&self, point: &Point) -> Color;
 }
 
-impl PatternType {
-    pub fn pattern_at(&self, point: &Point) -> Color {
-        match self {
-            PatternType::Solid { a } => *a,
-            PatternType::Stripe { a, b } => {
-                if point.x.floor() % 2. == 0. {
-                    *a
-                } else {
-                    *b
-                }
-            }
-            PatternType::Gradient { a, b } => *a + (*b - *a) * (point.x - point.x.floor()),
-            PatternType::Ring { a, b } => {
-                if (point.x * point.x + point.z * point.z).sqrt() % 2. == 0. {
-                    *a
-                } else {
-                    *b
-                }
-            }
-            PatternType::Checker { a, b } => {
-                if (point.x.floor() + point.y.floor() + point.z.floor()) % 2. == 0. {
-                    *a
-                } else {
-                    *b
-                }
-            }
+#[derive(Debug)]
+pub struct Solid {
+    a: Color,
+}
+
+impl PatternType for Solid {
+    fn pattern_at(&self, _point: &Point) -> Color {
+        self.a
+    }
+}
+
+#[derive(Debug)]
+pub struct Stripe {
+    a: Color,
+    b: Color,
+}
+
+impl PatternType for Stripe {
+    fn pattern_at(&self, point: &Point) -> Color {
+        if point.x.floor() % 2. == 0. {
+            self.a
+        } else {
+            self.b
         }
     }
 }
 
-#[derive(PartialEq, Debug, Copy, Clone)]
+#[derive(Debug)]
+pub struct Gradient {
+    a: Color,
+    b: Color,
+}
+
+impl PatternType for Gradient {
+    fn pattern_at(&self, point: &Point) -> Color {
+        self.a + (self.b - self.a) * (point.x - point.x.floor())
+    }
+}
+
+#[derive(Debug)]
+pub struct Ring {
+    a: Color,
+    b: Color,
+}
+
+impl PatternType for Ring {
+    fn pattern_at(&self, point: &Point) -> Color {
+        if (point.x * point.x + point.z * point.z).sqrt() % 2. == 0. {
+            self.a
+        } else {
+            self.b
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct Checker {
+    a: Color,
+    b: Color,
+}
+
+impl PatternType for Checker {
+    fn pattern_at(&self, point: &Point) -> Color {
+        if (point.x.floor() + point.y.floor() + point.z.floor()) % 2. == 0. {
+            self.a
+        } else {
+            self.b
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct Pattern {
     transform: Transformation,
     invered_transform: Transformation,
-    pattern_type: PatternType,
+    pattern_type: Rc<dyn PatternType>,
 }
 
 impl Pattern {
-    pub const fn solid(a: Color) -> Pattern {
-        Self::new(PatternType::Solid { a })
+    pub fn solid(a: Color) -> Pattern {
+        Self::new(Rc::new(Solid { a }))
     }
 
     pub fn stripe(a: Color, b: Color) -> Pattern {
-        Self::new(PatternType::Stripe { a, b })
+        Self::new(Rc::new(Stripe { a, b }))
     }
 
     pub fn gradient(a: Color, b: Color) -> Pattern {
-        Self::new(PatternType::Gradient { a, b })
+        Self::new(Rc::new(Gradient { a, b }))
     }
 
     pub fn ring(a: Color, b: Color) -> Pattern {
-        Self::new(PatternType::Ring { a, b })
+        Self::new(Rc::new(Ring { a, b }))
     }
 
     pub fn checker(a: Color, b: Color) -> Pattern {
-        Self::new(PatternType::Checker { a, b })
+        Self::new(Rc::new(Checker { a, b }))
     }
 
-    pub const fn new(pattern_type: PatternType) -> Pattern {
+    pub const fn new(pattern_type: Rc<dyn PatternType>) -> Pattern {
         Pattern {
             transform: Transformation::IDENTITY,
             invered_transform: Transformation::IDENTITY,
@@ -164,7 +202,7 @@ mod tests {
 
         #[test]
         fn a_stripe_pattern_is_constant_in_x() {
-            let pattern = PatternType::Solid { a: WHITE };
+            let pattern = Solid { a: WHITE };
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(1., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(2., 0., 0.)), WHITE);
@@ -172,7 +210,7 @@ mod tests {
 
         #[test]
         fn a_stripe_pattern_is_constant_in_y() {
-            let pattern = PatternType::Solid { a: WHITE };
+            let pattern = Solid { a: WHITE };
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 1., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 2., 0.)), WHITE);
@@ -180,7 +218,7 @@ mod tests {
 
         #[test]
         fn a_stripe_pattern_is_constant_in_z() {
-            let pattern = PatternType::Solid { a: WHITE };
+            let pattern = Solid { a: WHITE };
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 1.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 2.)), WHITE);
@@ -193,14 +231,14 @@ mod tests {
 
         #[test]
         fn creating_a_stripe_pattern() {
-            let pattern = PatternType::Stripe { a: WHITE, b: BLACK };
+            let pattern = Stripe { a: WHITE, b: BLACK };
 
-            assert!(matches!(pattern, PatternType::Stripe{a, b} if a == WHITE && b == BLACK))
+            assert!(matches!(pattern, Stripe{a, b} if a == WHITE && b == BLACK))
         }
 
         #[test]
         fn a_stripe_pattern_is_constant_in_y() {
-            let pattern = PatternType::Stripe { a: WHITE, b: BLACK };
+            let pattern = Stripe { a: WHITE, b: BLACK };
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 1., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 2., 0.)), WHITE);
@@ -208,7 +246,7 @@ mod tests {
 
         #[test]
         fn a_stripe_pattern_is_constant_in_z() {
-            let pattern = PatternType::Stripe { a: WHITE, b: BLACK };
+            let pattern = Stripe { a: WHITE, b: BLACK };
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 1.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 2.)), WHITE);
@@ -216,7 +254,7 @@ mod tests {
 
         #[test]
         fn a_stripe_pattern_alternates_in_x() {
-            let pattern = PatternType::Stripe { a: WHITE, b: BLACK };
+            let pattern = Stripe { a: WHITE, b: BLACK };
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0.9, 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(1., 0., 0.)), BLACK);
@@ -232,7 +270,7 @@ mod tests {
 
         #[test]
         fn a_gradient_linearly_interpolates_between_colors() {
-            let pattern = PatternType::Gradient { a: WHITE, b: BLACK };
+            let pattern = Gradient { a: WHITE, b: BLACK };
 
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(
@@ -256,7 +294,7 @@ mod tests {
 
         #[test]
         fn a_ring_should_extend_in_both_x_and_z() {
-            let pattern = PatternType::Ring { a: WHITE, b: BLACK };
+            let pattern = Ring { a: WHITE, b: BLACK };
 
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(1., 0., 0.)), BLACK);
@@ -271,7 +309,7 @@ mod tests {
 
         #[test]
         fn checker_pattern_should_repeat_in_x() {
-            let pattern = PatternType::Checker { a: WHITE, b: BLACK };
+            let pattern = Checker { a: WHITE, b: BLACK };
 
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0.99, 0., 0.)), WHITE);
@@ -280,7 +318,7 @@ mod tests {
 
         #[test]
         fn checker_pattern_should_repeat_in_y() {
-            let pattern = PatternType::Checker { a: WHITE, b: BLACK };
+            let pattern = Checker { a: WHITE, b: BLACK };
 
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0.99, 0.)), WHITE);
@@ -289,7 +327,7 @@ mod tests {
 
         #[test]
         fn checker_pattern_should_repeat_in_z() {
-            let pattern = PatternType::Checker { a: WHITE, b: BLACK };
+            let pattern = Checker { a: WHITE, b: BLACK };
 
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.99)), WHITE);

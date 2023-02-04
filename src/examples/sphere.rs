@@ -20,9 +20,9 @@ fn main() {
     let mut canvas = Canvas::new(canvas_pixels, canvas_pixels);
     let mut shape = Shape::sphere();
 
-    let mut material = Material::new();
+    let mut material = Material::default();
     material.set_color(Tuple::color(1., 0.2, 1.));
-    shape.material = material;
+    *shape.material_mut() = material;
 
     let light = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
 
@@ -40,7 +40,7 @@ fn main() {
                 let eye = -r.direction;
                 let color = hit
                     .object
-                    .material
+                    .material()
                     .lighting(&shape, &light, &point, &eye, &normal, false);
                 canvas.write_pixel(x, y, color);
             }
