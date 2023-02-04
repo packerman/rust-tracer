@@ -43,6 +43,6 @@ fn main() {
     }
     let ppm = c.to_ppm().unwrap();
     let path = Path::new("projectile.ppm");
-    let mut file = File::create(&path).unwrap();
+    let mut file = File::create(path).unwrap();
     file.write_all(ppm.as_bytes()).unwrap();
 }

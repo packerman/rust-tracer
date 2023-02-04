@@ -59,12 +59,12 @@ impl World {
     }
 
     pub fn color_at(&self, ray: &Ray) -> Color {
-        let intersections = self.intersect(&ray);
+        let intersections = self.intersect(ray);
         let hit = hit(&intersections);
         match hit {
             None => Color::BLACK,
             Some(h) => {
-                let comps = Computations::prepare(&h, &ray);
+                let comps = Computations::prepare(h, ray);
                 self.shade_hit(&comps)
             }
         }
@@ -158,7 +158,7 @@ mod tests {
         let w = World::default();
         let r = Ray::new(Tuple::point(0., 0., -5.), Tuple::vector(0., 0., 1.));
         let shape = &w.objects[0];
-        let i = Intersection::new(4., &shape);
+        let i = Intersection::new(4., shape);
 
         let comps = Computations::prepare(&i, &r);
         let c = w.shade_hit(&comps);
@@ -172,7 +172,7 @@ mod tests {
         w.lights[0] = PointLight::new(Tuple::point(0., 0.25, 0.), Tuple::color(1., 1., 1.));
         let r = Ray::new(Tuple::point(0., 0., 0.), Tuple::vector(0., 0., 1.));
         let shape = &w.objects[1];
-        let i = Intersection::new(0.5, &shape);
+        let i = Intersection::new(0.5, shape);
 
         let comps = Computations::prepare(&i, &r);
         let c = w.shade_hit(&comps);
@@ -214,7 +214,7 @@ mod tests {
         let inner_color = inner
             .material()
             .pattern
-            .pattern_at_shape(&inner, &Tuple::point(0., 0., 0.));
+            .pattern_at_shape(inner, &Tuple::point(0., 0., 0.));
         let r = Ray::new(Tuple::point(0., 0., 0.75), Tuple::vector(0., 0., -1.));
 
         let c = w.color_at(&r);

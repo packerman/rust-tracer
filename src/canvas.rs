@@ -34,13 +34,14 @@ impl PpmFormatter {
         if !self.line.is_empty() {
             write!(self.line, "{}", self.separator)?;
         }
-        write!(self.line, "{}", string)?;
+        write!(self.line, "{string}")?;
         Ok(())
     }
 
     fn new_line(&mut self) -> Result<()> {
-        write!(self.output, "{}\n", self.line)?;
-        Ok(self.line.clear())
+        writeln!(self.output, "{}", self.line)?;
+        self.line.clear();
+        Ok(())
     }
 
     fn flush(&mut self) -> Result<()> {
@@ -125,14 +126,14 @@ impl Canvas {
 
     fn save_to_ppm(&self, path: &Path) -> Result<()> {
         let ppm = self.to_ppm()?;
-        let mut file = File::create(&path)?;
+        let mut file = File::create(path)?;
         file.write_all(ppm.as_bytes())?;
         Ok(())
     }
 
     fn save_to_png(&self, path: &Path) -> Result<()> {
         let file = File::create(path)?;
-        let ref mut w = BufWriter::new(file);
+        let w = &mut BufWriter::new(file);
 
         let mut encoder = png::Encoder::new(w, self.width as u32, self.height as u32);
         encoder.set_color(png::ColorType::Rgb);
@@ -152,7 +153,7 @@ impl Canvas {
                 } else if ext == OsStr::new("png") {
                     self.save_to_png(path)
                 } else {
-                    Err(format!("Unsupported extension: {:?}", ext).into())
+                    Err(format!("Unsupported extension: {ext:?}").into())
                 }
             }
             None => Err("Unspecified extension".into()),

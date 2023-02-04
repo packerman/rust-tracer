@@ -24,14 +24,12 @@ impl Matrix4 {
         m32: Scalar,
         m33: Scalar,
     ) -> Matrix4 {
-        Matrix4 {
-            0: [
+        Matrix4([
                 [m00, m01, m02, m03],
                 [m10, m11, m12, m13],
                 [m20, m21, m22, m23],
                 [m30, m31, m32, m33],
-            ],
-        }
+            ])
     }
 
     pub const IDENTITY: Matrix4 = Matrix4::new(
@@ -45,7 +43,7 @@ impl Matrix4 {
                 result[i][j] = self.0[j][i];
             }
         }
-        Matrix4 { 0: result }
+        Matrix4(result)
     }
 
     fn sub_matrix(&self, l: usize, k: usize) -> Matrix3 {
@@ -55,7 +53,7 @@ impl Matrix4 {
                 result[i][j] = self.0[if i < l { i } else { i + 1 }][if j < k { j } else { j + 1 }]
             }
         }
-        Matrix3 { 0: result }
+        Matrix3(result)
     }
 
     fn minor(&self, l: usize, k: usize) -> Scalar {
@@ -85,7 +83,7 @@ impl Matrix4 {
                 result[j][i] = self.cofactor(i, j) / det;
             }
         }
-        Matrix4 { 0: result }
+        Matrix4(result)
     }
 }
 
@@ -110,7 +108,7 @@ impl Mul<Matrix4> for Matrix4 {
                     + self.0[i][3] * other.0[3][j];
             }
         }
-        Matrix4 { 0: result }
+        Matrix4(result)
     }
 }
 
@@ -163,9 +161,7 @@ pub struct Matrix2([[Scalar; 2]; 2]);
 
 impl Matrix2 {
     pub fn new(m00: Scalar, m01: Scalar, m10: Scalar, m11: Scalar) -> Matrix2 {
-        Matrix2 {
-            0: [[m00, m01], [m10, m11]],
-        }
+        Matrix2([[m00, m01], [m10, m11]])
     }
 
     pub fn determinant(&self) -> Scalar {
@@ -196,9 +192,7 @@ impl Matrix3 {
         m21: Scalar,
         m22: Scalar,
     ) -> Matrix3 {
-        Matrix3 {
-            0: [[m00, m01, m02], [m10, m11, m12], [m20, m21, m22]],
-        }
+        Matrix3([[m00, m01, m02], [m10, m11, m12], [m20, m21, m22]])
     }
 
     fn sub_matrix(&self, l: usize, k: usize) -> Matrix2 {
@@ -208,7 +202,7 @@ impl Matrix3 {
                 result[i][j] = self.0[if i < l { i } else { i + 1 }][if j < k { j } else { j + 1 }]
             }
         }
-        Matrix2 { 0: result }
+        Matrix2(result)
     }
 
     fn minor(&self, l: usize, k: usize) -> Scalar {

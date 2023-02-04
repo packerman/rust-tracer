@@ -35,6 +35,6 @@ fn main() {
 
     let ppm = canvas.to_ppm().unwrap();
     let path = Path::new("silhouette.ppm");
-    let mut file = File::create(&path).unwrap();
+    let mut file = File::create(path).unwrap();
     file.write_all(ppm.as_bytes()).unwrap();
 }

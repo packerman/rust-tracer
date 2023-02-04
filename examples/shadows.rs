@@ -38,7 +38,7 @@ fn main() {
     let mut ring_material = sphere_material.clone();
     ring_material.set_color(Tuple::color(0.1, 1., 0.1));
 
-    let mut pinky_material = sphere_material.clone();
+    let mut pinky_material = sphere_material;
     pinky_material.set_color(Tuple::color(0.1, 0.5, 1.));
 
     let mut backdrop = Shape::sphere();

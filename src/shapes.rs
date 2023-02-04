@@ -136,7 +136,7 @@ mod tests {
 
         let xs = s.intersect(&r);
 
-        assert!(xs.len() > 0);
+        assert!(!xs.is_empty());
         for x in xs.iter() {
             assert!(ptr::eq(x.object, &s));
         }
