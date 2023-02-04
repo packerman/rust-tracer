@@ -1,4 +1,4 @@
-use lib::{
+use rust_tracer::{
     camera::Camera, lights::PointLight, materials::Material, shapes::Shape,
     transformations::Transformation, tuples::Tuple, world::World,
 };

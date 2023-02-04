@@ -1,4 +1,4 @@
-use lib::{
+use rust_tracer::{
     canvas::Canvas,
     tuples::{Point, Tuple, Vector},
 };

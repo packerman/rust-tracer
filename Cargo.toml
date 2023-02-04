@@ -9,7 +9,3 @@ edition = "2021"
 [dependencies]
 approx = "*"
 png = "*"
-
-[lib]
-name = "lib"
-path = "src/lib.rs"
