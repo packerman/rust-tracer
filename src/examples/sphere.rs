@@ -34,7 +34,7 @@ fn main() {
             let r = Ray::new(ray_origin, (position - ray_origin).normalize());
             let xs = shape.intersect(&r);
 
-            for hit in hit(&xs) {
+            if let Some(hit) = hit(&xs) {
                 let point = r.position(hit.t);
                 let normal = hit.object.normal_at(&point);
                 let eye = -r.direction;
