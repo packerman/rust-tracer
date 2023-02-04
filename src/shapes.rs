@@ -7,7 +7,6 @@ use crate::tuples::Scalar;
 use crate::tuples::Tuple;
 use crate::tuples::Vector;
 use std::fmt::Debug;
-use std::rc::Rc;
 
 pub trait ShapeType: Debug {
     fn local_intersect(&self, ray: &Ray) -> Vec<Scalar>;
@@ -64,9 +63,10 @@ pub struct Shape {
     transform: Transformation,
     inversed_transform: Transformation,
     pub material: Material,
-    shape_type: Rc<dyn ShapeType>,
+    shape_type: Box<dyn ShapeType>,
 }
 
+// TODO
 // impl PartialEq for Shape {
 //     fn eq(&self, other: &Self) -> bool {
 //         self.transform == other.transform
@@ -77,14 +77,14 @@ pub struct Shape {
 
 impl Shape {
     pub fn sphere() -> Shape {
-        Self::new(Rc::new(Sphere))
+        Self::new(Box::new(Sphere))
     }
 
     pub fn plane() -> Shape {
-        Self::new(Rc::new(Plane))
+        Self::new(Box::new(Plane))
     }
 
-    fn new(shape_type: Rc<dyn ShapeType>) -> Shape {
+    fn new(shape_type: Box<dyn ShapeType>) -> Shape {
         Shape {
             transform: Transformation::IDENTITY,
             inversed_transform: Transformation::IDENTITY,
