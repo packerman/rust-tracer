@@ -4,8 +4,9 @@ use crate::tuples::Point;
 use crate::tuples::Scalar;
 use crate::tuples::Vector;
 use std::cmp::Ordering;
+use std::ptr;
 
-#[derive(PartialEq, Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Intersection<'a> {
     pub t: Scalar,
     pub object: &'a Shape,
@@ -14,6 +15,12 @@ pub struct Intersection<'a> {
 impl Intersection<'_> {
     pub fn new(t: Scalar, object: &Shape) -> Intersection {
         Intersection { t, object }
+    }
+}
+
+impl PartialEq for Intersection<'_> {
+    fn eq(&self, other: &Self) -> bool {
+        self.t == other.t && ptr::eq(self.object, other.object)
     }
 }
 
@@ -158,7 +165,7 @@ mod tests {
         let comps = Computations::prepare(&i, &r);
 
         assert_eq!(comps.t, i.t);
-        assert_eq!(comps.object, i.object);
+        assert!(ptr::eq(comps.object, i.object));
         assert_eq!(comps.point, Tuple::point(0., 0., -1.));
         assert_eq!(comps.eyev, Tuple::vector(0., 0., -1.));
         assert_eq!(comps.normalv, Tuple::vector(0., 0., -1.));
