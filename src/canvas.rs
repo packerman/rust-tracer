@@ -1,13 +1,12 @@
-use crate::tuples::Color;
-use crate::tuples::Scalar;
-use crate::tuples::Tuple;
-use std::error;
-use std::ffi::OsStr;
-use std::fmt::Write;
-use std::fs::File;
-use std::io::BufWriter;
-use std::io::Write as IOWrite;
-use std::path::Path;
+use crate::tuples::{Color, Scalar, Tuple};
+use std::{
+    error,
+    ffi::OsStr,
+    fmt::Write,
+    fs::File,
+    io::{BufWriter, Write as IOWrite},
+    path::Path,
+};
 
 type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
 

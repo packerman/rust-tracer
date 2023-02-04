@@ -1,14 +1,13 @@
-use lib::canvas::Canvas;
-use lib::intersections::hit;
-use lib::lights::PointLight;
-use lib::materials::Material;
-use lib::rays::Ray;
-use lib::shapes::Shape;
-use lib::tuples::Scalar;
-use lib::tuples::Tuple;
-use std::fs::File;
-use std::io::Write;
-use std::path::Path;
+use lib::{
+    canvas::Canvas,
+    intersections::hit,
+    lights::PointLight,
+    materials::Material,
+    rays::Ray,
+    shapes::Shape,
+    tuples::{Scalar, Tuple},
+};
+use std::{fs::File, io::Write, path::Path};
 
 fn main() {
     let ray_origin = Tuple::point(0., 0., -5.);

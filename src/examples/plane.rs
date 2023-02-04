@@ -1,12 +1,8 @@
-use lib::camera::Camera;
-use lib::lights::PointLight;
-use lib::materials::Material;
-use lib::shapes::Shape;
-use lib::transformations::Transformation;
-use lib::tuples::Tuple;
-use lib::world::World;
-use std::f64::consts::*;
-use std::path::Path;
+use lib::{
+    camera::Camera, lights::PointLight, materials::Material, shapes::Shape,
+    transformations::Transformation, tuples::Tuple, world::World,
+};
+use std::{f64::consts::*, path::Path};
 
 fn main() {
     let mut floor = Shape::plane();

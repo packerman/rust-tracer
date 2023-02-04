@@ -1,9 +1,10 @@
-use crate::canvas::Canvas;
-use crate::rays::Ray;
-use crate::transformations::Transformation;
-use crate::tuples::Scalar;
-use crate::tuples::Tuple;
-use crate::world::World;
+use crate::{
+    canvas::Canvas,
+    rays::Ray,
+    transformations::Transformation,
+    tuples::{Scalar, Tuple},
+    world::World,
+};
 
 pub struct Camera {
     hsize: usize,

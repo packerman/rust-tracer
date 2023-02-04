@@ -1,8 +1,6 @@
-use crate::tuples::Scalar;
-use crate::tuples::Tuple;
+use crate::tuples::{Scalar, Tuple};
 use approx::AbsDiffEq;
-use std::ops::Index;
-use std::ops::Mul;
+use std::ops::{Index, Mul};
 
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Matrix4([[Scalar; 4]; 4]);

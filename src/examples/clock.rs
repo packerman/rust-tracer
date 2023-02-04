@@ -1,12 +1,9 @@
-use lib::canvas::Canvas;
-use lib::transformations::Transformation;
-use lib::tuples::Point;
-use lib::tuples::Scalar;
-use lib::tuples::Tuple;
-use std::f64::consts::*;
-use std::fs::File;
-use std::io::Write;
-use std::path::Path;
+use lib::{
+    canvas::Canvas,
+    transformations::Transformation,
+    tuples::{Point, Scalar, Tuple},
+};
+use std::{f64::consts::*, fs::File, io::Write, path::Path};
 
 fn main() {
     let size = 800;

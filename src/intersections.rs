@@ -1,10 +1,9 @@
-use crate::rays::Ray;
-use crate::shapes::Shape;
-use crate::tuples::Point;
-use crate::tuples::Scalar;
-use crate::tuples::Vector;
-use std::cmp::Ordering;
-use std::ptr;
+use crate::{
+    rays::Ray,
+    shapes::Shape,
+    tuples::{Point, Scalar, Vector},
+};
+use std::{cmp::Ordering, ptr};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Intersection<'a> {
@@ -79,9 +78,7 @@ impl Computations<'_> {
 mod tests {
 
     use super::*;
-    use crate::rays::Ray;
-    use crate::transformations::Transformation;
-    use crate::tuples::Tuple;
+    use crate::{rays::Ray, transformations::Transformation, tuples::Tuple};
     use std::ptr;
 
     #[test]

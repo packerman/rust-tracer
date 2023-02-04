@@ -1,15 +1,12 @@
-use crate::intersections::hit;
-use crate::intersections::intersections;
-use crate::intersections::Computations;
-use crate::intersections::Intersection;
-use crate::lights::PointLight;
-use crate::materials::Material;
-use crate::rays::Ray;
-use crate::shapes::Shape;
-use crate::transformations::Transformation;
-use crate::tuples::Color;
-use crate::tuples::Point;
-use crate::tuples::Tuple;
+use crate::{
+    intersections::{hit, intersections, Computations, Intersection},
+    lights::PointLight,
+    materials::Material,
+    rays::Ray,
+    shapes::Shape,
+    transformations::Transformation,
+    tuples::{Color, Point, Tuple},
+};
 
 pub struct World {
     objects: Vec<Shape>,
@@ -109,8 +106,7 @@ impl Default for World {
 mod tests {
 
     use super::*;
-    use crate::intersections::Computations;
-    use crate::rays::Ray;
+    use crate::{intersections::Computations, rays::Ray};
     use approx::assert_abs_diff_eq;
 
     #[test]

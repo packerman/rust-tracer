@@ -1,11 +1,9 @@
-use crate::lights::PointLight;
-use crate::patterns::Pattern;
-use crate::shapes::Shape;
-use crate::tuples::Color;
-use crate::tuples::Point;
-use crate::tuples::Scalar;
-use crate::tuples::Tuple;
-use crate::tuples::Vector;
+use crate::{
+    lights::PointLight,
+    patterns::Pattern,
+    shapes::Shape,
+    tuples::{Color, Point, Scalar, Tuple, Vector},
+};
 
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Material {
@@ -85,9 +83,10 @@ mod tests {
     mod lighting_tests {
 
         use super::*;
-        use crate::materials::Material;
-        use crate::materials::Tuple;
-        use crate::tuples::Point;
+        use crate::{
+            materials::{Material, Tuple},
+            tuples::Point,
+        };
         use approx::assert_abs_diff_eq;
         use std::f64::consts::*;
 

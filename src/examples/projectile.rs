@@ -1,10 +1,8 @@
-use lib::canvas::Canvas;
-use lib::tuples::Point;
-use lib::tuples::Tuple;
-use lib::tuples::Vector;
-use std::fs::File;
-use std::io::Write;
-use std::path::Path;
+use lib::{
+    canvas::Canvas,
+    tuples::{Point, Tuple, Vector},
+};
+use std::{fs::File, io::Write, path::Path};
 
 struct Projectile {
     position: Point,

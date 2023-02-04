@@ -1,7 +1,8 @@
-use crate::shapes::Shape;
-use crate::transformations::Transformation;
-use crate::tuples::Color;
-use crate::tuples::Point;
+use crate::{
+    shapes::Shape,
+    transformations::Transformation,
+    tuples::{Color, Point},
+};
 
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub enum PatternType {
