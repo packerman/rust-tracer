@@ -81,7 +81,7 @@ impl Matrix4 {
         let mut result = [[0.; 4]; 4];
         for (i, row) in result.iter_mut().enumerate() {
             for (j, item) in row.iter_mut().enumerate() {
-                *item = self.cofactor(i, j) / det;
+                *item = self.cofactor(j, i) / det;
             }
         }
         Matrix4(result)

@@ -10,9 +10,15 @@ pub trait PatternType: Debug {
     fn pattern_at(&self, point: &Point) -> Color;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Solid {
     a: Color,
+}
+
+impl Solid {
+    pub fn new(a: Color) -> Rc<Self> {
+        Rc::new(Self { a })
+    }
 }
 
 impl PatternType for Solid {
@@ -21,62 +27,104 @@ impl PatternType for Solid {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Stripe {
-    a: Color,
-    b: Color,
+    a: Rc<dyn PatternType>,
+    b: Rc<dyn PatternType>,
+}
+
+impl Stripe {
+    pub fn new(a: Rc<dyn PatternType>, b: Rc<dyn PatternType>) -> Rc<Self> {
+        Rc::new(Self { a, b })
+    }
+
+    pub fn new_solid(a: Color, b: Color) -> Rc<Self> {
+        Self::new(Solid::new(a), Solid::new(b))
+    }
 }
 
 impl PatternType for Stripe {
     fn pattern_at(&self, point: &Point) -> Color {
         if point.x.floor() % 2. == 0. {
-            self.a
+            self.a.pattern_at(point)
         } else {
-            self.b
+            self.b.pattern_at(point)
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Gradient {
-    a: Color,
-    b: Color,
+    a: Rc<dyn PatternType>,
+    b: Rc<dyn PatternType>,
+}
+
+impl Gradient {
+    pub fn new(a: Rc<dyn PatternType>, b: Rc<dyn PatternType>) -> Rc<Self> {
+        Rc::new(Self { a, b })
+    }
+
+    pub fn new_solid(a: Color, b: Color) -> Rc<Self> {
+        Self::new(Solid::new(a), Solid::new(b))
+    }
 }
 
 impl PatternType for Gradient {
     fn pattern_at(&self, point: &Point) -> Color {
-        self.a + (self.b - self.a) * (point.x - point.x.floor())
+        let a = self.a.pattern_at(point);
+        let b = self.b.pattern_at(point);
+        a + (b - a) * (point.x - point.x.floor())
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Ring {
-    a: Color,
-    b: Color,
+    a: Rc<dyn PatternType>,
+    b: Rc<dyn PatternType>,
+}
+
+impl Ring {
+    pub fn new(a: Rc<dyn PatternType>, b: Rc<dyn PatternType>) -> Rc<Self> {
+        Rc::new(Self { a, b })
+    }
+
+    pub fn new_solid(a: Color, b: Color) -> Rc<Self> {
+        Self::new(Solid::new(a), Solid::new(b))
+    }
 }
 
 impl PatternType for Ring {
     fn pattern_at(&self, point: &Point) -> Color {
         if (point.x * point.x + point.z * point.z).sqrt() % 2. == 0. {
-            self.a
+            self.a.pattern_at(point)
         } else {
-            self.b
+            self.b.pattern_at(point)
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Checker {
-    a: Color,
-    b: Color,
+    a: Rc<dyn PatternType>,
+    b: Rc<dyn PatternType>,
+}
+
+impl Checker {
+    pub fn new(a: Rc<dyn PatternType>, b: Rc<dyn PatternType>) -> Rc<Self> {
+        Rc::new(Self { a, b })
+    }
+
+    pub fn new_solid(a: Color, b: Color) -> Rc<Self> {
+        Self::new(Solid::new(a), Solid::new(b))
+    }
 }
 
 impl PatternType for Checker {
     fn pattern_at(&self, point: &Point) -> Color {
         if (point.x.floor() + point.y.floor() + point.z.floor()) % 2. == 0. {
-            self.a
+            self.a.pattern_at(point)
         } else {
-            self.b
+            self.b.pattern_at(point)
         }
     }
 }
@@ -90,23 +138,23 @@ pub struct Pattern {
 
 impl Pattern {
     pub fn solid(a: Color) -> Pattern {
-        Self::new(Rc::new(Solid { a }))
+        Self::new(Solid::new(a))
     }
 
     pub fn stripe(a: Color, b: Color) -> Pattern {
-        Self::new(Rc::new(Stripe { a, b }))
+        Self::new(Stripe::new_solid(a, b))
     }
 
     pub fn gradient(a: Color, b: Color) -> Pattern {
-        Self::new(Rc::new(Gradient { a, b }))
+        Self::new(Gradient::new_solid(a, b))
     }
 
     pub fn ring(a: Color, b: Color) -> Pattern {
-        Self::new(Rc::new(Ring { a, b }))
+        Self::new(Ring::new_solid(a, b))
     }
 
     pub fn checker(a: Color, b: Color) -> Pattern {
-        Self::new(Rc::new(Checker { a, b }))
+        Self::new(Checker::new_solid(a, b))
     }
 
     pub const fn new(pattern_type: Rc<dyn PatternType>) -> Pattern {
@@ -196,13 +244,13 @@ mod tests {
         assert_eq!(c, WHITE);
     }
 
-    mod solid_pattern {
+    mod solid {
 
         use super::*;
 
         #[test]
         fn a_stripe_pattern_is_constant_in_x() {
-            let pattern = Solid { a: WHITE };
+            let pattern = Solid::new(WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(1., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(2., 0., 0.)), WHITE);
@@ -210,7 +258,7 @@ mod tests {
 
         #[test]
         fn a_stripe_pattern_is_constant_in_y() {
-            let pattern = Solid { a: WHITE };
+            let pattern = Solid::new(WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 1., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 2., 0.)), WHITE);
@@ -218,27 +266,20 @@ mod tests {
 
         #[test]
         fn a_stripe_pattern_is_constant_in_z() {
-            let pattern = Solid { a: WHITE };
+            let pattern = Solid::new(WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 1.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 2.)), WHITE);
         }
     }
 
-    mod stripe_pattern {
+    mod stripe {
 
         use super::*;
 
         #[test]
-        fn creating_a_stripe_pattern() {
-            let pattern = Stripe { a: WHITE, b: BLACK };
-
-            assert!(matches!(pattern, Stripe{a, b} if a == WHITE && b == BLACK))
-        }
-
-        #[test]
         fn a_stripe_pattern_is_constant_in_y() {
-            let pattern = Stripe { a: WHITE, b: BLACK };
+            let pattern = Stripe::new_solid(WHITE, BLACK);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 1., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 2., 0.)), WHITE);
@@ -246,7 +287,7 @@ mod tests {
 
         #[test]
         fn a_stripe_pattern_is_constant_in_z() {
-            let pattern = Stripe { a: WHITE, b: BLACK };
+            let pattern = Stripe::new_solid(WHITE, BLACK);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 1.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 2.)), WHITE);
@@ -254,7 +295,7 @@ mod tests {
 
         #[test]
         fn a_stripe_pattern_alternates_in_x() {
-            let pattern = Stripe { a: WHITE, b: BLACK };
+            let pattern = Stripe::new_solid(WHITE, BLACK);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0.9, 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(1., 0., 0.)), BLACK);
@@ -264,13 +305,13 @@ mod tests {
         }
     }
 
-    mod gradient_pattern {
+    mod gradient {
 
         use super::*;
 
         #[test]
         fn a_gradient_linearly_interpolates_between_colors() {
-            let pattern = Gradient { a: WHITE, b: BLACK };
+            let pattern = Gradient::new_solid(WHITE, BLACK);
 
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(
@@ -288,13 +329,13 @@ mod tests {
         }
     }
 
-    mod ring_pattern {
+    mod ring {
 
         use super::*;
 
         #[test]
         fn a_ring_should_extend_in_both_x_and_z() {
-            let pattern = Ring { a: WHITE, b: BLACK };
+            let pattern = Ring::new_solid(WHITE, BLACK);
 
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(1., 0., 0.)), BLACK);
@@ -303,13 +344,13 @@ mod tests {
         }
     }
 
-    mod checker_pattern {
+    mod checker {
 
         use super::*;
 
         #[test]
         fn checker_pattern_should_repeat_in_x() {
-            let pattern = Checker { a: WHITE, b: BLACK };
+            let pattern = Checker::new_solid(WHITE, BLACK);
 
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0.99, 0., 0.)), WHITE);
@@ -318,7 +359,7 @@ mod tests {
 
         #[test]
         fn checker_pattern_should_repeat_in_y() {
-            let pattern = Checker { a: WHITE, b: BLACK };
+            let pattern = Checker::new_solid(WHITE, BLACK);
 
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0.99, 0.)), WHITE);
@@ -327,7 +368,7 @@ mod tests {
 
         #[test]
         fn checker_pattern_should_repeat_in_z() {
-            let pattern = Checker { a: WHITE, b: BLACK };
+            let pattern = Checker::new_solid(WHITE, BLACK);
 
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.)), WHITE);
             assert_eq!(pattern.pattern_at(&Tuple::point(0., 0., 0.99)), WHITE);
