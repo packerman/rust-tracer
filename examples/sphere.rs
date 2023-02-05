@@ -1,14 +1,13 @@
-use lib::canvas::Canvas;
-use lib::intersections::hit;
-use lib::lights::PointLight;
-use lib::materials::Material;
-use lib::rays::Ray;
-use lib::shapes::Shape;
-use lib::tuples::Scalar;
-use lib::tuples::Tuple;
-use std::fs::File;
-use std::io::Write;
-use std::path::Path;
+use rust_tracer::{
+    canvas::Canvas,
+    intersections::hit,
+    lights::PointLight,
+    materials::Material,
+    rays::Ray,
+    shapes::Shape,
+    tuples::{Scalar, Tuple},
+};
+use std::{fs::File, io::Write, path::Path};
 
 fn main() {
     let ray_origin = Tuple::point(0., 0., -5.);
@@ -21,9 +20,9 @@ fn main() {
     let mut canvas = Canvas::new(canvas_pixels, canvas_pixels);
     let mut shape = Shape::sphere();
 
-    let mut material = Material::new();
+    let mut material = Material::default();
     material.set_color(Tuple::color(1., 0.2, 1.));
-    shape.material = material;
+    *shape.material_mut() = material;
 
     let light = PointLight::new(Tuple::point(-10., 10., -10.), Tuple::color(1., 1., 1.));
 
@@ -35,13 +34,13 @@ fn main() {
             let r = Ray::new(ray_origin, (position - ray_origin).normalize());
             let xs = shape.intersect(&r);
 
-            for hit in hit(&xs) {
+            if let Some(hit) = hit(&xs) {
                 let point = r.position(hit.t);
                 let normal = hit.object.normal_at(&point);
                 let eye = -r.direction;
                 let color = hit
                     .object
-                    .material
+                    .material()
                     .lighting(&shape, &light, &point, &eye, &normal, false);
                 canvas.write_pixel(x, y, color);
             }
@@ -50,6 +49,6 @@ fn main() {
 
     let ppm = canvas.to_ppm().unwrap();
     let path = Path::new("sphere.ppm");
-    let mut file = File::create(&path).unwrap();
+    let mut file = File::create(path).unwrap();
     file.write_all(ppm.as_bytes()).unwrap();
 }

@@ -1,10 +1,8 @@
-use lib::canvas::Canvas;
-use lib::tuples::Point;
-use lib::tuples::Tuple;
-use lib::tuples::Vector;
-use std::fs::File;
-use std::io::Write;
-use std::path::Path;
+use rust_tracer::{
+    canvas::Canvas,
+    tuples::{Point, Tuple, Vector},
+};
+use std::{fs::File, io::Write, path::Path};
 
 struct Projectile {
     position: Point,
@@ -45,6 +43,6 @@ fn main() {
     }
     let ppm = c.to_ppm().unwrap();
     let path = Path::new("projectile.ppm");
-    let mut file = File::create(&path).unwrap();
+    let mut file = File::create(path).unwrap();
     file.write_all(ppm.as_bytes()).unwrap();
 }

@@ -1,12 +1,9 @@
-use lib::canvas::Canvas;
-use lib::transformations::Transformation;
-use lib::tuples::Point;
-use lib::tuples::Scalar;
-use lib::tuples::Tuple;
-use std::f64::consts::*;
-use std::fs::File;
-use std::io::Write;
-use std::path::Path;
+use rust_tracer::{
+    canvas::Canvas,
+    transformations::Transformation,
+    tuples::{Point, Scalar, Tuple},
+};
+use std::{f64::consts::*, fs::File, io::Write, path::Path};
 
 fn main() {
     let size = 800;
@@ -29,6 +26,6 @@ fn main() {
 
     let ppm = c.to_ppm().unwrap();
     let path = Path::new("clock.ppm");
-    let mut file = File::create(&path).unwrap();
+    let mut file = File::create(path).unwrap();
     file.write_all(ppm.as_bytes()).unwrap();
 }

@@ -1,12 +1,11 @@
-use lib::canvas::Canvas;
-use lib::intersections::hit;
-use lib::rays::Ray;
-use lib::shapes::Shape;
-use lib::tuples::Scalar;
-use lib::tuples::Tuple;
-use std::fs::File;
-use std::io::Write;
-use std::path::Path;
+use rust_tracer::{
+    canvas::Canvas,
+    intersections::hit,
+    rays::Ray,
+    shapes::Shape,
+    tuples::{Scalar, Tuple},
+};
+use std::{fs::File, io::Write, path::Path};
 
 fn main() {
     let ray_origin = Tuple::point(0., 0., -5.);
@@ -36,6 +35,6 @@ fn main() {
 
     let ppm = canvas.to_ppm().unwrap();
     let path = Path::new("silhouette.ppm");
-    let mut file = File::create(&path).unwrap();
+    let mut file = File::create(path).unwrap();
     file.write_all(ppm.as_bytes()).unwrap();
 }

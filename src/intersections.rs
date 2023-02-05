@@ -1,11 +1,11 @@
-use crate::rays::Ray;
-use crate::shapes::Shape;
-use crate::tuples::Point;
-use crate::tuples::Scalar;
-use crate::tuples::Vector;
-use std::cmp::Ordering;
+use crate::{
+    rays::Ray,
+    shapes::Shape,
+    tuples::{Point, Scalar, Vector},
+};
+use std::{cmp::Ordering, ptr};
 
-#[derive(PartialEq, Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Intersection<'a> {
     pub t: Scalar,
     pub object: &'a Shape,
@@ -17,13 +17,19 @@ impl Intersection<'_> {
     }
 }
 
+impl PartialEq for Intersection<'_> {
+    fn eq(&self, other: &Self) -> bool {
+        self.t == other.t && ptr::eq(self.object, other.object)
+    }
+}
+
 impl PartialOrd for Intersection<'_> {
     fn partial_cmp(&self, other: &Intersection) -> Option<Ordering> {
         self.t.partial_cmp(&other.t)
     }
 }
 
-pub fn intersections<'a>(mut instersections: Vec<Intersection>) -> Vec<Intersection> {
+pub fn intersections(mut instersections: Vec<Intersection>) -> Vec<Intersection> {
     instersections.sort_by(|a, b| a.partial_cmp(b).unwrap());
     instersections
 }
@@ -72,9 +78,7 @@ impl Computations<'_> {
 mod tests {
 
     use super::*;
-    use crate::rays::Ray;
-    use crate::transformations::Transformation;
-    use crate::tuples::Tuple;
+    use crate::{rays::Ray, transformations::Transformation, tuples::Tuple};
     use std::ptr;
 
     #[test]
@@ -158,7 +162,7 @@ mod tests {
         let comps = Computations::prepare(&i, &r);
 
         assert_eq!(comps.t, i.t);
-        assert_eq!(comps.object, i.object);
+        assert!(ptr::eq(comps.object, i.object));
         assert_eq!(comps.point, Tuple::point(0., 0., -1.));
         assert_eq!(comps.eyev, Tuple::vector(0., 0., -1.));
         assert_eq!(comps.normalv, Tuple::vector(0., 0., -1.));

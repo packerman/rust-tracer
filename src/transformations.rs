@@ -1,7 +1,7 @@
-use crate::matrices::Matrix4;
-use crate::tuples::Point;
-use crate::tuples::Scalar;
-use crate::tuples::Vector;
+use crate::{
+    matrices::Matrix4,
+    tuples::{Point, Scalar, Vector},
+};
 
 pub type Transformation = Matrix4;
 

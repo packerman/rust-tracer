@@ -2,42 +2,10 @@
 name = "rust-tracer"
 version = "0.1.0"
 authors = ["Piotr Ackermann <pioacker@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 approx = "*"
 png = "*"
-
-[lib]
-name = "lib"
-path = "src/lib.rs"
-
-[[bin]]
-name = "projectile"
-path = "src/examples/projectile.rs"
-
-[[bin]]
-name = "clock"
-path = "src/examples/clock.rs"
-
-[[bin]]
-name = "silhouette"
-path = "src/examples/silhouette.rs"
-
-[[bin]]
-name = "sphere"
-path = "src/examples/sphere.rs"
-
-[[bin]]
-name = "scene"
-path = "src/examples/scene.rs"
-
-[[bin]]
-name = "shadows"
-path = "src/examples/shadows.rs"
-
-[[bin]]
-name = "plane"
-path = "src/examples/plane.rs"

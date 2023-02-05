@@ -1,7 +1,5 @@
 use approx::AbsDiffEq;
-use std::iter::Sum;
-use std::ops;
-use std::ops::AddAssign;
+use std::{iter::Sum, ops, ops::AddAssign};
 
 pub type Scalar = f64;
 

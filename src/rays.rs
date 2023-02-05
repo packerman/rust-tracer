@@ -1,7 +1,7 @@
-use crate::transformations::Transformation;
-use crate::tuples::Point;
-use crate::tuples::Scalar;
-use crate::tuples::Vector;
+use crate::{
+    transformations::Transformation,
+    tuples::{Point, Scalar, Vector},
+};
 
 pub struct Ray {
     pub origin: Point,
@@ -26,8 +26,7 @@ impl Ray {
 mod tests {
 
     use super::*;
-    use crate::transformations::Transformation;
-    use crate::tuples::Tuple;
+    use crate::{transformations::Transformation, tuples::Tuple};
 
     #[test]
     fn creating_ray() {
